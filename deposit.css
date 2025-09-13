@@ -1,0 +1,515 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(to right, #1c1d1e, #353839, #2f3132);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 30px 15px;
+}
+
+/* Container */
+.deposit-container {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.deposit-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 600;
+  font-size: 24px;
+}
+
+/* Input */
+input[type="number"],
+input[type="file"],
+select {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #f0f0f0;
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 15px;
+}
+
+/* Crypto buttons */
+.crypto-options {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.crypto-btn {
+  background: #0ef;
+  color: #000;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s;
+  font-weight: bold;
+}
+
+.crypto-btn:hover {
+  transform: scale(1.05);
+  background: #00cfe8;
+}
+
+/* Payment details */
+#paymentDetails {
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+#cryptoRate {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+#qrCode {
+  width: 150px;
+  height: 150px;
+  margin-bottom: 10px;
+}
+
+#cryptoAddress {
+  word-break: break-word;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+#confirmDepositBtn {
+  background: red;
+  color: #fff;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#confirmDepositBtn:hover {
+  background: #111;
+}
+
+/* Gift Card Section */
+#giftCardForm {
+  margin-top: 20px;
+  text-align: left;
+}
+
+#giftCardForm label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+#giftCardForm input,
+#giftCardForm select {
+  margin-bottom: 16px;
+}
+
+/* Popup styling */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(14, 14, 14, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.popup-content {
+  background-color: #111;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  color: #fff;
+  animation: slideUp 0.4s ease-in-out;
+}
+
+.popup-content h3 {
+  margin-bottom: 15px;
+  font-size: 22px;
+}
+
+.popup-content p {
+  margin-bottom: 20px;
+  font-size: 15px;
+}
+
+/* Minimized notice */
+#minimizedNotice {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  background: #222;
+  padding: 10px 15px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 14px;
+  z-index: 998;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+}
+
+/* Loader */
+.loader {
+  border: 5px solid #444;
+  border-top: 5px solid #0ef;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin: auto;
+  animation: spin 1s linear infinite;
+}
+
+/* Hidden class */
+.hidden {
+  display: none !important;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(15px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+@keyframes slideUp {
+  from {opacity: 0; transform: translateY(30px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+@keyframes spin {
+  0% { transform: rotate(0); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Success popup actions */
+.success-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.success-actions button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+#goDashboardBtn {
+  background-color: #3b82f6;
+  color: white;
+}
+
+#newDepositBtn {
+  background-color: #10b981;
+  color: white;
+}
+
+.success-actions button:hover {
+  opacity: 0.9;
+  transform: scale(1.03);
+}
+#giftCardForm {
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+#giftCardForm:not(.hidden) {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#giftCardForm {
+  margin-top: 25px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  animation: fadeSlideIn 0.5s ease forwards;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
+}
+
+#giftCardForm label {
+  font-weight: 600;
+  margin-top: 10px;
+  display: block;
+  color: #fff;
+}
+
+#giftCardForm select,
+#giftCardForm input[type="number"],
+#giftCardForm input[type="file"] {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px;
+  background: #f0f0f0;
+  color: #222;
+  margin-top: 6px;
+  margin-bottom: 18px;
+}
+
+#submitGiftCardBtn {
+  background: #f39c12;
+  color: #fff;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  width: 100%;
+}
+
+#submitGiftCardBtn:hover {
+  background: #e67e22;
+  transform: scale(1.03);
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Animated Form Styling */
+.animated-form {
+  animation: fadeInGift 0.5s ease-in-out;
+  margin-top: 20px;
+}
+
+
+
+@keyframes fadeInGift {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.crypto-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.crypto-btn {
+  background: linear-gradient(135deg, rgb(158, 125, 65), rgb(204, 161, 80));
+  color: #fff;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.crypto-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  background: linear-gradient(135deg, #111618, #101011);
+}
+
+.crypto-btn i {
+  font-size: 18px;
+}
+
+/* === Blocked Overlay Styling === */
+#blockedOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+#blockedOverlay .overlay-box {
+  background: white;
+  padding: 2rem;
+  border-radius: 1.25rem;
+  max-width: 90%;
+  width: 400px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  animation: fadeInScale 0.4s ease;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+#blockedOverlay h2 {
+  color: #e3342f;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+#blockedOverlay p {
+  color: #fff;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.chat-options-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem 1rem;
+}
+
+.chat-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 350px;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+
+.chat-card .icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #3b82f6;
+}
+
+.chat-card h3 {
+  font-size: 1.4rem;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.chat-card p {
+  font-size: 0.95rem;
+  color: #4b5563;
+  margin-bottom: 1.5rem;
+}
+
+.chat-card button {
+  background: linear-gradient(to right, #3b82f6, #2563eb);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.chat-card button:hover {
+  background: linear-gradient(to right, #2563eb, #1d4ed8);
+}
+
+.pulse-card::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  height: 200%;
+  transform: translate(-50%, -50%);
+  background: rgba(59, 130, 246, 0.15);
+  border-radius: 50%;
+  animation: pulseGlow 2.5s infinite ease-out;
+  z-index: -1;
+}
+
+@keyframes pulseGlow {
+  0% {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.2;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0.7;
+  }
+}
+
+@media (max-width: 768px) {
+  .chat-options-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .chat-card {
+    width: 100%;
+    max-width: 90%;
+  }
+}
+.hidden {
+  display: none;
+}
+body.modal-open {
+  overflow: hidden;
+}
+
+#openSupportBtn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(to right, #ef4444, #b91c1c);
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(185, 28, 28, 0.4);
+  animation: pulseBtn 1.5s infinite ease-in-out;
+  transition: transform 0.2s ease;
+}

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Complete Your Profile – AurumCapital</title>
+  <link rel="stylesheet" href="edit_profile.css" />
+  <link rel="icon" href="logo.png" type="image/png">
+</head>
+<body>
+  <div class="profile-container">
+
+    <!-- ✅ Progress Bar -->
+    <div class="progress-bar-wrapper">
+      <div class="progress-bar"></div>
+    </div>
+
+    <!-- ✅ Step-based Form -->
+    <div class="form-area">
+
+  <!-- Step 1: Username -->
+  <div class="step-screen hidden" id="step0">
+    <h2>Step 1: Choose Username</h2>
+    <input type="text" id="username" placeholder="e.g. cryptoKing21" required />
+    <div class="step-nav">
+      <button class="next-btn">Next</button>
+    </div>
+  </div>
+
+  <!-- Step 2: DOB & Country -->
+  <div class="step-screen hidden" id="step1">
+    <h2>Step 2: Date of Birth & Country</h2>
+    <input type="date" id="dob" required />
+    <select id="country" required>
+      <option value="">🌍 Select Your Country</option>
+    </select>
+    <div class="step-nav">
+      <button class="prev-btn">Previous</button>
+      <button class="next-btn">Next</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Phone Number -->
+  <div class="step-screen hidden" id="step2">
+    <h2>Step 3: Your Phone Number</h2>
+    <input type="tel" id="phone" placeholder="+1 800 0000 " required />
+    <div class="step-nav">
+      <button class="prev-btn">Previous</button>
+      <button class="next-btn">Next</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Security Question -->
+  <div class="step-screen hidden" id="step3">
+    <h2>Step 4: Security Question</h2>
+    <select id="security" required>
+      <option value="">Choose a Question</option>
+      <option value="pet">What’s your first pet’s name?</option>
+      <option value="school">What’s the name of your primary school?</option>
+      <option value="city">What city were you born in?</option>
+    </select>
+    <input type="text" id="answer" placeholder="Answer..." required />
+    <div class="step-nav">
+      <button class="prev-btn">Previous</button>
+      <button class="next-btn">Next</button>
+    </div>
+  </div>
+
+  <!-- Step 5: Email Confirmation -->
+  <div class="step-screen hidden" id="step4">
+    <h2>Step 5: Confirm Your Email</h2>
+    <label>Registered Email:</label>
+    <p id="currentEmail" class="readonly-email">Loading...</p>
+    <input type="email" id="newEmail" placeholder="Change email (optional)" />
+    <div class="step-nav">
+      <button class="prev-btn">Previous</button>
+      <button class="next-btn">Confirm & Finish</button>
+    </div>
+  </div> 
+</div>
+
+ <!-- 🕒 Waiting for Email Verification -->
+    <div class="step-screen hidden" id="step5-waiting">
+      <div class="verify-wait-box">
+        <div class="loader-icon"></div>
+        <h2>📨 Email Verification Sent</h2>
+        <p>Please check your inbox or spam to verify your email.</p>
+        <p class="small-text">Waiting for confirmation...</p>
+      </div>
+    </div>
+
+    <!-- ✅ Success Screen -->
+    <div class="success-screen hidden">
+      <h2>🎉 Profile Verified Successfully!</h2>
+      <p>You are now fully verified on BitFidelity.</p>
+      <a href="dashboard.html" class="go-dashboard-btn">Go to Dashboard</a>
+    </div>
+
+<!-- 🔄 Already Verified -->
+    <div class="already-verified hidden">
+      <h2>✅ You're Already Verified</h2>
+      <p>If you'd like to change anything, kindly contact BitFidelity Support.</p>
+      <a href="dashboard.html" class="go-dashboard-btn">Go to Dashboard</a>
+    </div>
+        
+  </div>
+
+  <!-- 🔒 Password Modal -->
+  <div id="passwordModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>🔐 Re-authentication Required</h3>
+      <p>Please enter your current password to proceed:</p>
+      <input type="password" id="passwordInput" placeholder="Enter your password" />
+      <button id="confirmPasswordBtn">Continue</button>
+      <p id="passwordError" class="error-msg hidden">⚠️ Invalid password. Try again.</p>
+    </div>
+  </div>
+
+  <!-- 📬 Toast Notification -->
+  <div id="confirmationToast" class="toast hidden">
+    <span>📧 Confirmation email sent! Please check your inbox.</span>
+  </div>
+
+  <div id="blockedOverlay" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-md z-[9999] flex items-center justify-center hidden">
+  <div class="bg-white p-8 rounded-xl shadow-xl max-w-md w-full text-center animate-fade-in">
+    <h2 class="text-2xl font-bold text-red-600 mb-4">🚫 Account Blocked</h2>
+    <p class="text-gray-700 mb-6">
+      We noticed unusual activities on your account and your account has been <strong>temporarily Suspended</strong>.
+      <br><br>
+      Please contact live support to rectify the issue.
+    </p>
+    <button id="contactSupportBtn" class="px-6 py-2 bg-gradient-to-r from-red-500 to-red-700 text-white rounded-full font-semibold text-sm shadow-md animate-pulse hover:scale-105 transition">
+      💬 Contact Support
+    </button>
+  </div>
+</div>
+
+  <script type="module" src="edit_profile.js"></script>
+</body>
+</html>

@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AuraCapital.com | AI-powered Profitable investing</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="dashboard.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+
+</head>
+<body>
+  <!-- 🔝 Header / Navbar -->
+  <header class="header">
+    <div class="container">
+      <div class="logo"><img src="logo.png" width="70px" height="70px"></div>
+      <nav class="nav">
+        <a href="faq.html">FAQ</a>
+        <a href="terms.html">Terms of Use</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="about.html">About</a>
+      </nav>
+      <div class="auth-buttons">
+  <!-- Avatar (hidden by default) -->
+  <div id="navAvatarWrapper" class="nav-avatar-wrapper" style="display: none;">
+    <img id="navUserAvatar" class="nav-avatar" src="" alt="User Avatar" />
+    <div id="navVerifiedBadge" class="verified-badge" style="display: none;">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="white">
+        <path d="M9.00041 16.1998L4.80041 11.9998L3.40041 13.3998L9.00041 18.9998L21.0004 6.99976L19.6004 5.59976L9.00041 16.1998Z"/>
+      </svg>
+    </div>
+  </div>
+  <a href="signin.html" class="btn-outline" id="loginBtn">Sign in</a>
+  <a href="signup.html" class="btn-filled" id="registerBtn">Get Started With Us Today</a>
+</div>
+
+    </div>
+  </header>
+
+
+<section class="hero">
+  <!-- 🌊 Animated Wave Background -->
+  <div class="hero-waves"></div>
+<div class="hero-bg-blend"></div>
+  <!-- 🌌 Particle Overlay -->
+<canvas class="hero-particles"></canvas>
+
+
+  <div class="hero-content">
+  <h1>AI-powered Profitable investing</h1>
+  <p>Let our smart Engines grow your money while you relax.</p>
+  <div class="hero-cta">
+  <button id="heroActionBtn" class="btn1 primary1">
+    <span id="heroButtonText">Get Started With Us Today ╰┈➤</span>
+    
+  </button>
+</div>
+
+
+ <!-- Leaderboard Section -->
+<div class="leaderboard-container" >
+  <div class="leaderboard-toggle-wrapper">
+  <button id="leaderboardToggleBtn" class="leaderboard-toggle-btn" aria-label="Toggle Leaderboard">
+    <span class="arrow-icon">📈</span>
+    <span class="toggle-text" id="leaderboardTitle">Our Top Investors</span>
+  </button>
+</div>
+
+
+    <div class="leaderboard-scroll" aria-label="Top investors leaderboard" id="leaderboardScroll">
+
+      <!-- Investor cards with verified badges -->
+<div class="investor-card top-investor" tabindex="0">
+  <div class="investor-rank">#1</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://cdnb.artstation.com/p/assets/images/images/037/250/389/large/jaqen-art-self-genshin.jpg?1619888825" alt="Investor #15 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Emsa****</div>
+  <div class="investor-amount">$521.7M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#2</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://www.shutterstock.com/image-vector/digital-painting-boy-anime-style-600nw-2302127233.jpg" alt="Investor #14 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Liau****</div>
+  <div class="investor-amount">$333.1M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#3</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://api.dicebear.com/7.x/avataaars/svg?seed=SatoshiAI" alt="Investor #13 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Oliv******</div>
+  <div class="investor-amount">$200M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#4</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://media.craiyon.com/2025-04-07/S9QyJvP7Rya9oBiXmGXnNw.webp" alt="Investor #12 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Noav***</div>
+  <div class="investor-amount">$130M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#5</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://static.vecteezy.com/system/resources/thumbnails/036/434/388/small_2x/anime-cute-girl-face-portrait-cartoon-character-illustration-vector.jpg" alt="Investor #11 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Soph*********</div>
+  <div class="investor-amount">$92M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#6</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://api.dicebear.com/7.x/avataaars/svg?seed=LunaCrypto" alt="Investor #10 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Jame***</div>
+  <div class="investor-amount">$75.5M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#7</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" 
+    src="https://api.dicebear.com/7.x/avataaars/svg?seed=MochiDrop" alt="Investor #9 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Isob********</div>
+  <div class="investor-amount">$41M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#8</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://api.dicebear.com/7.x/avataaars/svg?seed=SenpaiHodl" alt="Investor #8 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Bente******</div>
+  <div class="investor-amount">$22.2M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#9</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://img.freepik.com/premium-vector/anime-girl-cartoon-character-illustration-manually-created_648489-206.jpg" alt="Investor #7 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Mial*******</div>
+  <div class="investor-amount">$11.6M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#10</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://media.craiyon.com/2025-04-07/Fkt_6APEQk6mHHwfezZ9aQ.webp" alt="Investor #6 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Elis***</div>
+  <div class="investor-amount">$4.5M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#11</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://api.dicebear.com/7.x/avataaars/svg?seed=CryptoTenshi" alt="Investor #5 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Amel***</div>
+  <div class="investor-amount">$990K</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#12</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVfg2Q-Y-edpyFk1LUmv1yR6TrwXZDp0GYTg&s" alt="Investor #4 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Will********</div>
+  <div class="investor-amount">$712K</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#13</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://api.dicebear.com/7.x/avataaars/svg?seed=NekoTrader" alt="Investor #3 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Char*****</div>
+  <div class="investor-amount">$504K</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#14</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://files.idyllic.app/files/static/3731658" alt="Investor #2 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Zame******</div>
+  <div class="investor-amount">$480K</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#15</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" 
+    src="https://api.dicebear.com/7.x/avataaars/svg?seed=MidoriKaze" alt="Investor #1 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Alep****</div>
+  <div class="investor-amount">$455K</div>
+</div>
+
+
+
+    </div>
+  </div>
+
+
+</div>
+
+</section>
+
+
+
+
+
+
+<!-- 💰 Live Crypto Rate Bar -->
+<section class="crypto-rate-bar">
+  <div class="rate-scroll" id="cryptoRates">
+    <!-- Populated dynamically by JS -->
+  </div>
+</section>
+
+
+  <!-- 📈 BTC Chart -->
+  <div class="chart-container">
+    <div id="tradingview_btc"></div>
+  </div>
+
+
+
+
+
+<!-- 🌟 Features Section -->
+<section class="features" id="features">
+  <div class="features-container">
+    
+      <section class="live-performance">
+        <h2 class="features-title">Why AurumCapital?</h2>
+  <div class="performance-grid">
+
+    <!-- 1 -->
+    <div class="perf-card">
+      <div class="icon">📈</div>
+      <h3 class="value">+820.42%</h3>
+      <p class="label">Today's AI Yield</p>
+      <p class="desc">Net profit generated today by the AI engine across all strategies.</p>
+    </div>
+
+    <!-- 2 -->
+    <div class="perf-card">
+      <div class="icon">🤖</div>
+      <h3 class="value">61,284</h3>
+      <p class="label">Smart Trades Executed</p>
+      <p class="desc">Number of real-time AI trades placed using predictive models.</p>
+    </div>
+
+    <!-- 3 -->
+    <div class="perf-card">
+      <div class="icon">🧠</div>
+      <h3 class="value">147 Models</h3>
+      <p class="label">AI Strategies Running</p>
+      <p class="desc">Independent AI strategies trained on historical data & signals.</p>
+    </div>
+
+    <!-- 4 -->
+    <div class="perf-card">
+      <div class="icon">📊</div>
+      <h3 class="value">37 Signals</h3>
+      <p class="label">Live Market Indicators</p>
+      <p class="desc">Real-time signals triggered from our global crypto scanners.</p>
+    </div>
+
+    <!-- 5 -->
+    <div class="perf-card">
+      <div class="icon">🚀</div>
+      <h3 class="value">SOL +12.6%</h3>
+      <p class="label">Top Performing Asset</p>
+      <p class="desc">Asset with highest ROI in the past 24 hours across the platform.</p>
+    </div>
+
+    <!-- 6 -->
+    <div class="perf-card">
+      <div class="icon">🧾</div>
+      <h3 class="value">Warren B., ARK</h3>
+      <p class="label">Mogul Patterns Used</p>
+      <p class="desc">AI mimics strategies from elite investors like Buffett, ARK & more.</p>
+    </div>
+
+    <!-- 7 -->
+    <div class="perf-card">
+      <div class="icon">⚖️</div>
+      <h3 class="value">3 Adjustments</h3>
+      <p class="label">Portfolio Balancing</p>
+      <p class="desc">Automatic rebalancing to keep your risk/reward ratio optimized.</p>
+    </div>
+
+    <!-- 8 -->
+    <div class="perf-card">
+      <div class="icon">📡</div>
+      <h3 class="value">92%</h3>
+      <p class="label">Signal Accuracy Rate</p>
+      <p class="desc">Percentage of AI signals that led to profitable trade outcomes.</p>
+    </div>
+
+    <!-- 9 -->
+    <div class="perf-card">
+      <div class="icon">⚙️</div>
+      <h3 class="value">0.42s</h3>
+      <p class="label">AI Decision Speed</p>
+      <p class="desc">Average time it takes AI to process and react to market events.</p>
+    </div>
+
+    <!-- 10 -->
+    <div class="perf-card">
+      <div class="icon">🛡️</div>
+      <h3 class="value">99.998%</h3>
+      <p class="label">Platform Uptime</p>
+      <p class="desc">System reliability for uninterrupted trade execution 24/7.</p>
+    </div>
+  </div>
+</section>
+  </div>
+</section>
+
+
+<!-- AI Trade Time Machine Section -->
+<section id="aiTimeMachine" class="time-machine-section">
+  <div class="background-effect"></div>
+<canvas id="matrixCanvas"></canvas>
+  <div class="container">
+    <h2 class="section-title">🕰️ AI Trade Time Machine</h2>
+    <p class="section-subtitle">See how our AI would’ve traded key moments in crypto history</p>
+
+    <!-- Event Selector -->
+    <div class="event-selector">
+      <button class="event-btn" data-event="ftx">FTX Collapse</button>
+  <button class="event-btn" data-event="bullrun">2021 Bull Run</button>
+  <button class="event-btn" data-event="covid">COVID-19 Crash</button>
+  <button class="event-btn" data-event="luna">Luna Crash</button>
+  <button class="event-btn" data-event="halving">Bitcoin Halving</button>
+  <button class="event-btn" data-event="ethmerge">ETH Merge</button>
+    </div>
+
+    <!-- Simulation Area -->
+    <div id="simulationArea" class="simulation-area">
+      <div class="ai-terminal">
+        <div id="aiLogs" class="ai-logs">
+          <p class="placeholder">Select an event to simulate AI's strategy...</p>
+        </div>
+      </div>
+
+      <div class="ai-stats">
+        <div class="stat-box">
+          <label>Risk Level</label>
+          <div id="riskLevel">-</div>
+        </div>
+        <div class="stat-box">
+          <label>Profit Outcome</label>
+          <div id="profitResult">-</div>
+        </div>
+        <div class="stat-box">
+          <label>Trade Duration</label>
+          <div id="duration">-</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  serverTimestamp,
+  onSnapshot,
+  query,
+  orderBy,
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyCF4I3704KZW6jmvasHGmdsK468ssAuebA",
+  authDomain: "altumfi-f39f1.firebaseapp.com",
+  projectId: "altumfi-f39f1",
+  storageBucket: "altumfi-f39f1.appspot.com",
+  messagingSenderId: "838201454123",
+  appId: "1:838201454123:web:c738f1938438c7dd9b446e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// DOM
+const chatWindow = document.getElementById("chatWindow");
+const chatInput = document.getElementById("chatInput");
+const sendBtn = document.getElementById("sendBtn");
+const modal = document.getElementById("supportModal");
+const supportButton = document.getElementById("supportButton");
+const badge = document.getElementById("supportBadge");
+
+// Typing indicator
+const typingIndicator = document.createElement("div");
+typingIndicator.className = "typing-indicator";
+typingIndicator.textContent = "Support is typing...";
+typingIndicator.style.display = "none";
+chatWindow.appendChild(typingIndicator);
+
+let userId = null;
+let unseenMessages = 0;
+let lastBotMessageTimestamp = null;
+
+// Auth listener
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    userId = user.uid;
+    loadMessages();
+  }
+});
+
+// Load & display chat messages
+function loadMessages() {
+  const q = query(
+    collection(db, "Support", userId, "messages"),
+    orderBy("timestamp")
+  );
+
+  onSnapshot(q, (snapshot) => {
+    chatWindow.innerHTML = "";
+    unseenMessages = 0;
+
+    snapshot.forEach((doc) => {
+      const msg = doc.data();
+      const div = document.createElement("div");
+      div.className = `message ${msg.sender === "user" ? "user" : "bot"}`;
+
+      const timestamp = msg.timestamp?.toDate?.();
+      const timeString = timestamp
+        ? new Intl.DateTimeFormat("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          }).format(timestamp)
+        : "";
+
+      // Track last bot message
+      if (msg.sender === "bot") {
+        lastBotMessageTimestamp = timestamp;
+        if (modal.style.display === "none" || modal.style.display === "") {
+          unseenMessages++;
+        }
+      }
+
+      div.innerHTML = `
+        ${msg.sender === "bot" ? '<img class="avatar" src="admin-avatar.png" />' : ""}
+        <span>${msg.text}</span>
+        <div class="timestamp">${timeString}</div>
+      `;
+
+      chatWindow.appendChild(div);
+    });
+
+    chatWindow.appendChild(typingIndicator);
+
+    // Show badge if unseen messages
+    if (unseenMessages > 0) {
+      badge.textContent = unseenMessages;
+      badge.style.display = "inline-block";
+    } else {
+      badge.style.display = "none";
+    }
+
+    scrollToBottom();
+  });
+}
+
+// Send message
+sendBtn.onclick = async () => {
+  const text = chatInput.value.trim();
+  if (!text || !userId) return;
+
+  await addDoc(collection(db, "Support", userId, "messages"), {
+    sender: "user",
+    text,
+    timestamp: serverTimestamp(),
+  });
+
+  chatInput.value = "";
+  showTyping();
+  scrollToBottom();
+
+  // Check if admin hasn't responded in 10 mins
+  const now = new Date();
+  const tenMins = 10 * 60 * 1000;
+
+  if (!lastBotMessageTimestamp || now - lastBotMessageTimestamp > tenMins) {
+    setTimeout(async () => {
+      await addDoc(collection(db, "Support", userId, "messages"), {
+        sender: "bot",
+        text: "Thanks for reaching out. Our team will respond shortly.",
+        timestamp: serverTimestamp(),
+      });
+      hideTyping();
+      scrollToBottom();
+    }, 1200);
+  } else {
+    hideTyping();
+  }
+};
+
+// Typing animation control
+function showTyping() {
+  typingIndicator.style.display = "block";
+  scrollToBottom();
+}
+function hideTyping() {
+  typingIndicator.style.display = "none";
+}
+
+// Scroll to bottom
+function scrollToBottom() {
+  setTimeout(() => {
+    chatWindow.scrollTo({
+      top: chatWindow.scrollHeight,
+      behavior: "smooth"
+    });
+  }, 60);
+}
+
+// Toggle modal open/close
+supportButton.onclick = () => {
+  if (modal.style.display === "none" || modal.style.display === "") {
+    modal.style.display = "flex";
+    badge.style.display = "none";
+    unseenMessages = 0;
+  } else {
+    modal.style.display = "none";
+  }
+};
+
+</script>
+
+
+
+
+
+ <script src="https://s3.tradingview.com/tv.js"></script>
+ 
+<script src="script.js" type="module"></script>
+
+</body>
+
+<footer class="site-footer">
+  <div class="footer-content container">
+    <div class="footer-brand">
+      <img src="logo.png" alt="AurumCapital Logo" class="footer-logo">
+      <p class="footer-tagline">AI-powered crypto investing platform for a smarter future.</p>
+    </div>
+
+    <div class="footer-links">
+      <div class="link-column">
+        <h4>Product</h4>
+        <a href="features.html">Features</a>
+        <a href="privacy.html">Privacy/Security</a>
+      </div>
+      <div class="link-column">
+        <h4>Company</h4>
+        <a href="about.html">About</a>
+        <a href="faq.html">FAQ</a>
+        <a href="support.html">Support</a>
+      </div>
+      <div class="link-column">
+        <h4>Resources</h4>
+        <a href="contact.html">Contact Us</a>
+      </div>
+    </div>
+
+    <div class="footer-social">
+      <h4>Connect</h4>
+      <div class="social-icons">
+        <a href="https://x.com/official_aurumcapital"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="https://discord.com/aurum_capital100"><i class="fa-brands fa-discord"></i></a>
+        <a href="https://telegram.com/aurum-capital-tm"><i class="fa-brands fa-telegram"></i></a>
+        <a href="https://github.com/aurum-capital"><i class="fa-brands fa-github"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2025 AurumCapital. All rights reserved.</p>
+    <div class="legal-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Use</a>
+    </div>
+  </div>
+</footer>
+
+</html>

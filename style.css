@@ -1,0 +1,976 @@
+/* Base Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html, body {
+  font-family: 'Inter', sans-serif;
+  background-color: #171719;
+  color: #e2e8f0;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+}
+
+/* Container Wrapper */
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 1.5rem;
+}
+
+/* Header */
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: rgba(15, 15, 20, 0.95);
+  border-bottom: 1px solid #333336;
+  z-index: 100;
+}
+.header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: fit-content;
+}
+
+@media only screen and (max-width: 730px) {
+.header .container 
+{
+  align-items: center;
+  
+}
+}
+
+.logo {
+  max-height: 100%;
+  display: block;
+}
+
+@media only screen and (max-width: 730px) {
+.logo {
+  display: block;
+}
+}
+.nav {
+  display: flex;
+  gap: 2rem;
+}
+.nav a {
+  color: #b0b0b0;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+.nav a:hover {
+  color: rgb(227, 179, 90);
+}
+
+@media only screen and (max-width: 730px) {
+.nav a {
+  display: none;
+}
+}
+
+/* Auth Buttons */
+.auth-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+.btn-outline, .btn-filled {
+  font-size: 0.85rem;
+  padding: 0.55rem 1.2rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+.btn-outline {
+  border: 1px solid rgb(221, 176, 93);
+  color: rgb(221, 176, 93);
+}
+.btn-outline:hover {
+  background-color: rgb(221, 176, 93);
+  color: #0a0a0f;
+}
+.btn-filled {
+  background-color: rgb(185, 147, 75);
+  color: #0a0a0f;
+}
+.btn-filled:hover {
+  background-color: rgb(185, 147, 75);
+}
+
+@media only screen and (max-width: 730px) {
+
+  .btn-outline, .btn-filled {
+    font-size: 0.6rem;
+    height: 40px;
+  }
+}
+
+/* Hero Section */
+.hero {
+  position: relative;
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.4), #000);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  padding-top: 80px;
+}
+
+.hero-bg-blend {
+  position: absolute;
+  inset: 0;
+  background-image: url('https://wallpapers.com/images/hd/graphs-centerpiece-of-investment-b9cwch7q58taoqss.jpg');
+  background-size: cover;        /* ✅ always fill container without repeat */
+  background-repeat: no-repeat;  /* ✅ prevent duplication */
+  background-position: center;   /* ✅ keep it centered */
+  opacity: 0.15;
+  z-index: 1;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: bgPanZoom 30s ease-in-out infinite alternate;
+}
+
+@media only screen and (max-width: 730px) {
+.hero {
+  padding-top: 70px;
+}
+}
+.hero-content {
+  max-width: 100%;
+  margin: auto;
+}
+.hero-title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+}
+.hero-subtitle {
+  font-size: 1.1rem;
+  color: #a0a0a0;
+  margin-bottom: 2.5rem;
+}
+
+/* Feature Grid */
+.features {
+}
+.features-title {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  color: rgb(220, 179, 103);
+}
+
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  max-width: 1100px;
+  margin: auto;
+}
+.feature-card {
+  background-color: #12121c;
+  padding: 2rem;
+  border: 1px solid #1a1a2e;
+  border-radius: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 20px rgba(0, 224, 224, 0.05);
+}
+.feature-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+.feature-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.feature-card p {
+  font-size: 0.92rem;
+  color: #b5b5b5;
+}
+
+/* Rate Bar */
+.rate-bar-pro {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 15px 20px;
+  background-color: #161b22;
+  border-bottom: 1px solid #222;
+}
+
+.rate-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  background: #1f242d;
+  padding: 8px 14px;
+  border-radius: 8px;
+  box-shadow: 0 0 4px rgba(0, 224, 224, 0.2);
+}
+
+.rate-item span {
+  color: #00e0e0;
+  font-weight: bold;
+}
+
+/* 📈 BTC Chart Container */
+.chart-container {
+  width: 100%;
+  height: 500px;
+  background-color: #0d1117;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+#tradingview_btc {
+  width: 100%;
+  height: 100%;
+}
+
+/* 🚀 Hero Section */
+/* 🔮 AI Animated Background */
+/* 🌊 Animated Gradient AI Waves */
+.hero-waves {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 120%;
+  z-index: 1;
+  background: linear-gradient(-45deg, #e07b00, #29120c, #63312b, #3e2424);
+  background-size: 400% 400%;
+  animation: gradientWave 15s ease infinite;
+  opacity: 0.25;
+  pointer-events: none;
+  filter: blur(30px);
+}
+
+@keyframes gradientWave {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+/* 🌌 Hero Particle Glow */
+.hero-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+/* ✨ Hero Content Styling */
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 20px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 800;
+  background: linear-gradient(90deg, rgb(221, 176, 93));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 20px;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+@media only screen and (max-width: 730px) {
+  .hero h1 {
+    font-size: clamp(1.5rem, 6vw, 4rem);
+  }
+}
+
+.hero p {
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  color: #bbb;
+  margin-bottom: 40px;
+  line-height: 1.6;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media only screen and (max-width: 730px) {
+  .hero p {
+    font-size: clamp(0.5rem, 2.5vw, 1.3rem);
+    margin-bottom: 20px;
+  }
+}
+
+/* 🌟 Pro Button Styling */
+.btn1.primary1 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 36px;
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  font-weight: 600;
+  height: 70px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgb(221, 176, 93), rgb(187, 149, 77)); /* orange by default */
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(255, 136, 0, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+
+.btn.primary:hover {
+  transform: scale(1.04);
+}
+
+@media only screen and (max-width: 730px) {
+  .btn1.primary1 {
+    padding: 0px 36px;
+    height: 50px;
+    font-size: clamp(0.7rem, 2vw, 1.1rem);
+  }
+}
+
+/* 👤 Avatar inside button */
+.hero-avatar-wrapper {
+  position: relative;
+  width: 34px;
+  height: 34px;
+}
+
+.hero-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+}
+
+/* ✅ Verified Badge Overlay */
+/* 🔵 Verified Badge (Blue Circle + White Check + Pulse) */
+.verified-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  background: #1da1f2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulseBadge 1.5s infinite;
+  box-shadow: 0 0 0 2px white;
+  z-index: 2;
+}
+
+@keyframes pulseBadge {
+  0% {
+    box-shadow: 0 0 0 0 rgba(29, 161, 242, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(29, 161, 242, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(29, 161, 242, 0);
+  }
+}
+
+.btn-outline {
+  background: transparent;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: 0.3s ease;
+}
+
+.btn-filled {
+  background: linear-gradient(90deg, rgb(185, 147, 75), rgb(237, 188, 98));
+  color: #0d1117;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  transition: 0.3s ease;
+}
+
+.btn-outline:hover,
+.btn-filled:hover {
+  transform: scale(1.03);
+}
+.nav-avatar-wrapper {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  background: linear-gradient(135deg, #ff8800, #ffaa00);
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.nav-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.verified-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  background: #1da1f2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulseBadge 1.5s infinite;
+  box-shadow: 0 0 0 2px white;
+  z-index: 2;
+}
+
+@keyframes pulseBadge {
+  0% {
+    box-shadow: 0 0 0 0 rgba(29, 161, 242, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(29, 161, 242, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(29, 161, 242, 0);
+  }
+}
+.crypto-rate-bar {
+  width: 100%;
+  background: #0f0f0f;
+  color: #fff;
+  overflow-x: auto;
+  padding: 10px 0;
+  border-top: 1px solid #222;
+  border-bottom: 1px solid #222;
+}
+
+.rate-scroll {
+  display: flex;
+  gap: 24px;
+  padding: 0 20px;
+  animation: slideIn 0.6s ease-in-out;
+}
+
+.rate-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 500;
+  background: #1a1a1a;
+  border-radius: 50px;
+  padding: 8px 16px;
+  transition: 0.3s;
+  border: 1px solid #333;
+}
+
+.rate-item:hover {
+  background: #222;
+}
+
+.coin-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.price {
+  font-weight: bold;
+}
+
+.change {
+  font-size: 13px;
+  margin-left: 6px;
+}
+
+.change.positive {
+  color: #4caf50;
+}
+
+.change.negative {
+  color: #f44336;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+
+
+@keyframes bgPanZoom {
+  0% {
+    background-size: 110%;
+    background-position: center;
+  }
+  50% {
+    background-size: 120%;
+    background-position: top;
+  }
+  100% {
+    background-size: 110%;
+    background-position: bottom;
+  }
+}
+
+
+/* 🌟 Live Performance Panel Styles */
+.live-performance {
+  width: 100%;
+  padding: 30px 20px;
+  background: linear-gradient(45deg,  #222222, rgb(36, 32, 26));
+  backdrop-filter: blur(6px);
+}
+
+.performance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.perf-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  position: relative;
+}
+
+.perf-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 32px rgba(75, 71, 63, 0.2);
+}
+
+.perf-card .icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.perf-card .value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffd166;
+}
+
+.perf-card .label {
+  font-size: 0.95rem;
+  opacity: 0.75;
+  margin-top: 6px;
+}
+
+/* Optional: animation pulse for .value */
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.85; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.perf-card .value.pulse {
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+/* Responsive tweak for small devices */
+@media (max-width: 768px) {
+  .perf-card .icon {
+    font-size: 28px;
+  }
+  .perf-card .value {
+    font-size: 1.4rem;
+  }
+}
+.perf-card .desc {
+  font-size: 0.85rem;
+  color: #aaa;
+  margin-top: 4px;
+  line-height: 1.4;
+  min-height: 40px;
+}
+
+
+/* === AI Trade Time Machine Section === */
+.time-machine-section {
+  background: linear-gradient(135deg, #0e0e0e, #1c1c1c);
+  color: #fff;
+  padding: 80px 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.section-title {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.section-subtitle {
+  text-align: center;
+  font-size: 1rem;
+  margin-bottom: 30px;
+  color: #ccc;
+}
+
+/* Event Buttons */
+.event-selector {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.event-btn {
+  background: #1f1f1f;
+  border: 1px solid #444;
+  padding: 10px 18px;
+  color: #eee;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.event-btn:hover,
+.event-btn.active {
+  background: #292929;
+  border-color: rgb(185, 147, 75);
+  color: rgb(235, 185, 93);
+}
+
+/* Simulation Display Area */
+.simulation-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.ai-terminal {
+  flex: 1 1 400px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #444;
+  border-radius: 10px;
+  padding: 20px;
+  min-height: 250px;
+  max-height: 300px;
+  overflow-y: auto;
+  font-family: 'Courier New', monospace;
+  color: #0f0;
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
+}
+
+.ai-terminal .placeholder {
+  color: #666;
+}
+
+/* Stat Boxes */
+.ai-stats {
+  flex: 1 1 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #444;
+  border-radius: 10px;
+  padding: 15px 20px;
+  text-align: center;
+  transition: 0.3s ease;
+}
+
+.stat-box label {
+  display: block;
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+
+.stat-box div {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: rgb(185, 147, 75);
+}
+
+/* Background Animation for Time Machine Section */
+#aiTimeMachine {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.background-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(0, 255, 204, 0.1), transparent 60%);
+  animation: pulseGlow 6s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.05);
+  }
+}
+
+.time-machine-section .container {
+  position: relative;
+  z-index: 2;
+}
+#matrixCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: transparent;
+  opacity: 0.15;
+  pointer-events: none;
+}
+#aiTimeMachine .container {
+  position: relative;
+  z-index: 2;
+}
+/* Animation class */
+.ai-pulse {
+  animation: aiPulse 0.5s ease;
+}
+
+@keyframes aiPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(0, 255, 204, 0.3);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.6);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(0, 255, 204, 0);
+  }
+}
+.site-footer {
+  background: #0a0a0a;
+  color: #ccc;
+  padding: 60px 20px 30px;
+  font-size: 14px;
+  line-height: 1.6;
+  position: relative;
+  overflow: hidden;
+}
+
+.site-footer::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0,255,204,0.05), transparent 70%);
+  animation: pulseBG 8s infinite linear;
+  z-index: 0;
+}
+
+@keyframes pulseBG {
+  0% { transform: rotate(0deg) scale(1); }
+  100% { transform: rotate(360deg) scale(1.2); }
+}
+
+.footer-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.footer-brand {
+  flex: 1 1 250px;
+  margin-bottom: 20px;
+}
+
+.footer-logo {
+  height: 40px;
+  margin-bottom: 10px;
+}
+
+.footer-tagline {
+  color: #aaa;
+  font-size: 13px;
+}
+
+.footer-links {
+  display: flex;
+  flex: 2 1 400px;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.link-column h4 {
+  color: #fff;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+.link-column a {
+  display: block;
+  margin-bottom: 8px;
+  color: #888;
+  transition: color 0.3s;
+}
+
+.link-column a:hover {
+  color: #00ffcc;
+}
+
+.footer-social {
+  flex: 1 1 180px;
+}
+
+.footer-social h4 {
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.social-icons a {
+  color: #888;
+  font-size: 18px;
+  margin-right: 14px;
+  transition: color 0.3s ease;
+}
+
+.social-icons a:hover {
+  color: #00ffcc;
+}
+
+.footer-bottom {
+  border-top: 1px solid #222;
+  margin-top: 40px;
+  padding-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #666;
+  z-index: 2;
+  position: relative;
+}
+
+.footer-bottom .legal-links a {
+  margin-left: 20px;
+  color: #666;
+  text-decoration: none;
+}
+
+.footer-bottom .legal-links a:hover {
+  color: #00ffcc;
+}
+
+@media screen and (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .footer-bottom .legal-links a {
+    margin-left: 0;
+    margin-right: 15px;
+  }
+}
+
+
+
+.badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background-color: red;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 50%;
+  font-weight: bold;
+  display: none;
+  box-shadow: 0 0 0 2px #1e1e1e;
+  z-index: 10000;
+}
+
+/* 🔄 Pulse animation for button */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(30, 144, 255, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(30, 144, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(30, 144, 255, 0);
+  }
+}

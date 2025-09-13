@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Us – BitFidelity</title>
+  <link rel="stylesheet" href="contact.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <section class="contact-container">
+    <div class="contact-wrapper">
+      <!-- Left Side: Info -->
+      <div class="contact-info">
+        <h1>Contact BitFidelity</h1>
+        <p>We’re here to answer your questions and support your journey with AI-powered crypto investments.</p>
+
+        <div class="info-box">
+          <h3>📧 Email Support</h3>
+          <p><a href="mailto:support@bitfidelity.com">support@bitfidelity.com</a></p>
+        </div>
+
+        <div class="info-box">
+          <h3>📍 Office Address</h3>
+          <p>BitFidelity HQ<br>New York City, NY, USA</p>
+        </div>
+
+        <div class="info-box">
+          <h3>🕒 Business Hours</h3>
+          <p>Monday – Friday: 9:00 AM – 6:00 PM (EST)</p>
+        </div>
+      </div>
+
+      <!-- Right Side: Form -->
+      <div class="contact-form-card">
+        <h2>Send a Message</h2>
+        <form class="contact-form">
+          <div class="form-row">
+            <input type="text" placeholder="Your Full Name" required>
+          </div>
+          <div class="form-row">
+            <input type="email" placeholder="Your Email Address" required>
+          </div>
+          <div class="form-row">
+            <select required>
+              <option value="">Select Topic</option>
+              <option value="support">Support</option>
+              <option value="feedback">Feedback</option>
+              <option value="partnership">Partnership</option>
+              <option value="press">Press Inquiry</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <textarea rows="5" placeholder="Your Message" required></textarea>
+          </div>
+          <div class="form-row">
+            <button type="submit">Submit Message</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+<!-- Success Overlay -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <lottie-player
+      src="https://assets9.lottiefiles.com/packages/lf20_jbrw3hcz.json"
+      background="transparent"
+      speed="1"
+      style="width: 100px; height: 100px;"
+      autoplay
+    ></lottie-player>
+    <h2>Message Sent!</h2>
+    <p>Thank you for reaching out to BitFidelity. We'll get back to you shortly.</p>
+    <button onclick="closeSuccess()">Close</button>
+  </div>
+</div>
+
+<script>
+  document.querySelector(".contact-form").addEventListener("submit", function (e) {
+    e.preventDefault(); // Prevent real submission
+
+    // Optional: Clear form after animation
+    this.reset();
+
+    // Show animation overlay
+    document.getElementById("successOverlay").style.display = "flex";
+  });
+
+  function closeSuccess() {
+    document.getElementById("successOverlay").style.display = "none";
+  }
+</script>
+
+</body>
+</html>

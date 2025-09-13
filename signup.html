@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AurumCapital Sign-Up</title>
+  <link rel="stylesheet" href="signup.css" />
+  <!-- Font Awesome for icons -->
+   <link rel="icon" href="logo.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+  <div class="signup-wrapper">
+    <!-- Logo -->
+    <div class="logo-container">
+      <img src="logo.png" alt="AurumCapital Logo" class="signup-logo" />
+    </div>
+
+    <div class="signup-card glassy">
+      <div class="progress-visual">
+        <div class="progress-fill" id="progressFill"></div>
+        <div class="step-icon active"><i class="fas fa-user"></i></div>
+        <div class="step-icon"><i class="fas fa-lock"></i></div>
+        <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+      </div>
+
+      <form id="signupForm">
+        <!-- Step 1: Account -->
+        <div class="form-step active">
+          <h2>Create Your Account</h2>
+          <div class="input-wrap">
+            <label><i class="fas fa-user"></i> Full Name</label>
+            <input type="text" id="name" placeholder="John Doe" required />
+          </div>
+          <div class="input-wrap">
+            <label><i class="fas fa-envelope"></i> Email</label>
+            <input type="email" id="email" placeholder="you@example.com" required />
+          </div>
+          <button type="button" onclick="nextStep()">Next</button>
+        </div>
+
+        <!-- Step 2: Security -->
+        <div class="form-step">
+          <h2>Secure Your Account</h2>
+          <div class="input-wrap">
+            <label><i class="fas fa-lock"></i> Password</label>
+            <input type="password" id="password" placeholder="••••••••" required />
+          </div>
+          <div class="input-wrap">
+            <label><i class="fas fa-lock"></i> Confirm Password</label>
+            <input type="password" id="confirmPassword" placeholder="••••••••" required />
+          </div>
+          <div class="step-buttons">
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="button" onclick="nextStep()">Next</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Confirmation -->
+        <div class="form-step">
+          <h2>All Set! 🎉</h2>
+          <p>You're ready to start growing your wealth.</p>
+          <div class="step-buttons">
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="submit">Finish & Sign Up</button>
+          </div>
+        </div>
+      </form>
+
+      <div class="divider"></div><br/>
+      <p class="signin-prompt">
+  Already have an account?
+  <a href="signin.html">Sign in here</a>
+</p>
+
+    </div>
+  </div>
+<!-- Success/Error Popup -->
+<div id="popupMessage" class="popup hidden">
+  <div class="popup-content">
+    <h2 id="popupTitle">🎉 Success!</h2>
+    <p id="popupText">Your account has been created.</p>
+    <button onclick="closePopup()">Okay</button>
+  </div>
+</div>
+  <!-- Firebase / App Script -->
+  <script type="module" src="signup.js"></script>
+</body>
+
+
+</html>

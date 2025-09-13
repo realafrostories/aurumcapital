@@ -1,0 +1,154 @@
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background-color: #0a0d12;
+  color: #d1d5db;
+  line-height: 1.7;
+}
+
+/* Containers */
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 60px 24px;
+}
+
+/* Header */
+.about-header {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  text-align: center;
+  box-shadow: inset 0 -1px 0 #2c3e50;
+}
+.about-header h1 {
+  font-size: 3rem;
+  color: #22d3ee;
+  margin-bottom: 12px;
+}
+.about-header p {
+  font-size: 1.2rem;
+  color: #94a3b8;
+}
+
+/* Mission Section */
+.mission-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 100px;
+}
+.mission-section .text {
+  flex: 1;
+}
+.mission-section .text h2 {
+  font-size: 2.2rem;
+  color: #22d3ee;
+  margin-bottom: 20px;
+}
+.mission-section .text p {
+  font-size: 1rem;
+  color: #cbd5e1;
+}
+.mission-section .image {
+  flex: 1;
+}
+.mission-section .image img {
+  max-width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 16px 40px rgba(0, 255, 255, 0.15);
+}
+
+/* Team Section */
+.team-section {
+}
+.team-section h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #22d3ee;
+  margin-bottom: 48px;
+}
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 32px;
+}
+.team-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 32px 24px;
+  text-align: center;
+  backdrop-filter: blur(12px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.team-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 32px rgba(34, 211, 238, 0.3);
+}
+.team-card img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 16px;
+}
+.team-card h3 {
+  font-size: 1.25rem;
+  color: #f8fafc;
+  margin-bottom: 8px;
+}
+.team-card p {
+  font-size: 0.95rem;
+  color: #cbd5e1;
+}
+
+/* Values Section */
+.values-section {
+  text-align: center;
+}
+.values-section h2 {
+  font-size: 2.4rem;
+  color: #22d3ee;
+  margin-bottom: 24px;
+}
+.values-list {
+  max-width: 800px;
+  margin: auto;
+  text-align: left;
+}
+.values-list li {
+  padding: 20px;
+  margin-bottom: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 4px solid #22d3ee;
+  border-radius: 12px;
+  color: #e2e8f0;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Footer */
+.about-footer {
+  text-align: center;
+  padding: 40px 24px;
+  border-top: 1px solid #1e293b;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mission-section {
+    flex-direction: column;
+    text-align: center;
+  }
+  .mission-section .text,
+  .mission-section .image {
+    width: 100%;
+  }
+}

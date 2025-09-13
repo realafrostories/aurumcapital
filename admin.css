@@ -1,0 +1,642 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f3f3f3;
+  padding: 20px;
+}
+
+.admin-container {
+  max-width: 800px;
+  margin: auto;
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+.deposit-item {
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deposit-item:last-child {
+  border-bottom: none;
+}
+
+button.approve-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.tab {
+  padding: 8px 16px;
+  background: #eee;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.tab.active {
+  background: #4CAF50;
+  color: white;
+}
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+.deposit-item {
+  background: #f9f9f9;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #2196f3;
+  border-radius: 5px;
+}
+.approve-btn {
+  margin-top: 10px;
+  background: #28a745;
+  color: white;
+  padding: 6px 10px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.deposits-section {
+  display: none;
+}
+
+.deposits-section.active {
+  display: block;
+}
+.disapprove-btn {
+  background-color: #e74c3c; /* Red */
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-left: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.disapprove-btn:hover {
+  background-color: #c0392b;
+}
+.deposits-section {
+  display: none;
+}
+.deposits-section.active {
+  display: block;
+}
+
+.approve-btn {
+  background-color: #2ecc71; /* green */
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.approve-btn:hover {
+  background-color: #27ae60;
+}
+
+/* Optional: disapprove button styles could be moved here instead of inline */
+.disapprove-btn {
+  background-color: #e74c3c; /* red */
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-left: 10px;
+}
+.disapprove-btn:hover {
+  background-color: #c0392b;
+}
+.tab-content,
+.sub-section {
+  display: none;
+}
+.tab-content.active,
+.sub-section.active {
+  display: block;
+}
+
+.tab,
+.sub-tab {
+  padding: 8px 16px;
+  margin-right: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.tab.active,
+.sub-tab.active {
+  background-color: #2563eb;
+  color: white;
+}
+/* ===== Enhanced Admin Card Depth & Animation ===== */
+.card {
+  background: linear-gradient(to bottom right, #0f172a, #1e293b);
+  border: 1px solid #334155;
+  border-radius: 18px;
+  padding: 1.5rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Left-glow stripe (accent) */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(to bottom, #3b82f6, #0ea5e9);
+  border-radius: 6px;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+}
+
+/* Smooth number transitions */
+.card span.wallet-balance {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #facc15;
+  letter-spacing: 0.4px;
+  transition: color 0.3s ease;
+}
+
+.card span.wallet-balance:hover {
+  color: #fde047;
+}
+
+/* ===== Button Polishing ===== */
+.user-actions button {
+  padding: 0.45rem 1rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #1e293b;
+  border: 1px solid transparent;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.25s ease-in-out;
+}
+
+.user-actions button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+/* Individual Button Theming */
+.sendBtn {
+  background: #3b82f6;
+  border-color: #60a5fa;
+}
+.sendBtn:hover {
+  background: #2563eb;
+}
+
+.replyBtn {
+  background: #10b981;
+  border-color: #34d399;
+}
+.replyBtn:hover {
+  background: #059669;
+}
+
+.blockBtn {
+  background: #ef4444;
+  border-color: #f87171;
+}
+.blockBtn:hover {
+  background: #b91c1c;
+}
+
+.addFundsBtn {
+  background: #f59e0b;
+  border-color: #fcd34d;
+}
+.addFundsBtn:hover {
+  background: #d97706;
+}
+
+/* ===== Tab/Subtab Gradient Hover Effects ===== */
+.tab, .sub-tab {
+  background: linear-gradient(to right, #1e3a8a, #3b82f6);
+  color: white;
+  border-radius: 999px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(59,130,246,0.3);
+}
+
+.tab:hover, .sub-tab:hover {
+  background: linear-gradient(to right, #1d4ed8, #2563eb);
+  transform: translateY(-2px);
+}
+
+.tab.active, .sub-tab.active {
+  background: linear-gradient(to right, #0ea5e9, #3b82f6);
+  color: white;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3);
+}
+
+/* ===== Responsive Grid Layout Adjustments ===== */
+@media (max-width: 768px) {
+  .user-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .card {
+    padding: 1.2rem;
+  }
+
+  .tab, .sub-tab {
+    font-size: 0.82rem;
+    padding: 0.4rem 1rem;
+  }
+}
+
+/* ===== Notification Badge (for future feature) ===== */
+.badge {
+  display: inline-block;
+  background: #f87171;
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  margin-left: 0.3rem;
+  box-shadow: 0 0 0 2px white;
+}
+/* ========= Universal Card Styling (Based on Tailwind-like classes) ========= */
+.p-4 {
+  padding: 1rem;
+}
+
+.bg-white {
+  background-color: #ffffff;
+  background: linear-gradient(to bottom right, #f8fafc, #e2e8f0);
+}
+
+.shadow {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.shadow:hover {
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+}
+
+.rounded {
+  border-radius: 16px;
+}
+
+.space-y-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+/* ========= BitFidelity Accent Style Enhancements ========= */
+.p-4.bg-white.shadow.rounded.space-y-2 {
+  border-left: 4px solid #3b82f6;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
+}
+
+.p-4.bg-white.shadow.rounded.space-y-2:hover {
+  box-shadow: 0 18px 44px rgba(59, 130, 246, 0.15);
+}
+
+/* Optional glowing bar */
+.p-4.bg-white.shadow.rounded.space-y-2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 5px;
+  background: linear-gradient(to bottom, #3b82f6, #06b6d4);
+  border-top-left-radius: 16px;
+  border-bottom-left-radius: 16px;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+}
+.username {
+  color: #0d73ef;
+  font-size: 1.25rem;
+  margin-bottom: 0.3rem;
+}
+
+.label {
+  color: #4a6583;
+  font-weight: 600;
+}
+
+.wallet-balance {
+  color: #0aae20;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* Smooth glow buttons (already matched styles) */
+.sendBtn, .replyBtn, .addFundsBtn, .blockBtn {
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  color: white;
+}
+
+.disabledBtn {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  background: #9ca3af !important;
+}
+
+/* Optional subtle hover scale */
+.user-card-content {
+  transition: transform 0.3s ease;
+}
+.user-card-content:hover {
+  transform: scale(1.01);
+}
+.chat-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.chat-popup.hidden {
+  display: none;
+}
+
+.chat-box {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 450px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  animation: slideUp 0.4s ease;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.chat-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.chat-close {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  color: #f87171;
+  cursor: pointer;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 300px;
+  padding-right: 4px;
+  margin-bottom: 1rem;
+}
+
+.chat-messages p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.chat-input-box {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chat-input-box input {
+  flex: 1;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.95rem;
+  background: #f8fafc;
+  color: #1e293b;
+}
+
+.chat-input-box button {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  background: #3b82f6;
+  color: white;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.chat-input-box button:hover {
+  background: #2563eb;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.chat-bubble {
+  padding: 0.6rem 1rem;
+  margin: 0.4rem 0;
+  border-radius: 12px;
+  max-width: 70%;
+  font-size: 0.9rem;
+  word-wrap: break-word;
+}
+
+.from-user {
+  background-color: #e2e8f0;
+  color: #1e293b;
+  text-align: left;
+  border-bottom-left-radius: 0;
+  margin-right: auto;
+}
+
+.from-admin {
+  background-color: #1e40af;
+  color: white;
+  text-align: right;
+  border-bottom-right-radius: 0;
+  margin-left: auto;
+}
+/* 🔔 Notification Modal Animation */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-pop-in {
+  animation: pop-in 0.3s ease-out;
+}
+/* 🔔 Fixed Notification Popup Layout */
+#notificationPopup {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  background-color: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  animation: fadeInOverlay 0.3s ease-in-out forwards;
+}
+
+#notificationPopup.hidden {
+  display: none !important;
+}
+
+/* 🔔 Modal Content Box */
+#notificationPopup .modal-content {
+  background: linear-gradient(to bottom right, #1e293b, #0f172a);
+  border: 1px solid #334155;
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 90%;
+  max-width: 480px;
+  color: #e2e8f0;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  animation: pop-in 0.3s ease-out;
+  position: relative;
+}
+
+/* 🔔 Form Fields */
+#notificationPopup input,
+#notificationPopup textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background-color: #0f172a;
+  color: #f1f5f9;
+  font-size: 0.95rem;
+  transition: border 0.2s ease;
+}
+
+#notificationPopup input:focus,
+#notificationPopup textarea:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+/* 🔘 Buttons */
+#notificationPopup .send-btn {
+  background: #3b82f6;
+  color: white;
+  padding: 0.6rem 1.4rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#notificationPopup .send-btn:hover {
+  background: #2563eb;
+}
+
+#notificationPopup .cancel-btn {
+  background: transparent;
+  border: none;
+  color: #f87171;
+  font-weight: 500;
+  cursor: pointer;
+  margin-right: auto;
+}
+
+#notificationPopup .cancel-btn:hover {
+  text-decoration: underline;
+  color: #ef4444;
+}
+
+/* 🔔 Animations */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+.removeFundsBtn {
+  background-color: #f87171; /* red-400 */
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+}

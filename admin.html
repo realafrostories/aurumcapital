@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Panel - Deposits & Withdrawals</title>
+  <link rel="stylesheet" href="admin.css" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+</head>
+<body>
+  <h2 class="text-2xl font-bold mb-4">AurumCapital Admin Panel</h2>
+
+  <!-- Primary Tabs: Deposits | Withdrawals -->
+  <div class="tabs">
+    <button id="tabDeposits" class="tab active">💰 Deposits</button>
+    <button id="tabWithdrawals" class="tab">💸 Withdrawals</button>
+    <!-- Add this next to tabDeposits and tabWithdrawals -->
+<button id="tabUsers" class="tab">👥 Users</button>
+  </div>
+
+  <!-- ========== Deposits Tab Content ========== -->
+  <div id="depositsContent" class="tab-content active">
+    <!-- Sub-Tabs -->
+    <button id="depositTabPending" class="sub-tab">
+  ⏳ Pending (<span id="depositCountPending">0</span>)
+</button>
+
+<button id="depositTabApproved" class="sub-tab">
+  ✅ Approved (<span id="depositCountTrue">0</span>)
+</button>
+
+<button id="depositTabDeclined" class="sub-tab">
+  ⛔ Declined (<span id="depositCountFalse">0</span>)
+</button>
+
+    <!-- Sub-Tab Sections -->
+    <section id="depositPendingSection" class="sub-section active">
+      <h3>Pending Deposits</h3>
+      <div id="depositPendingList"></div>
+    </section>
+
+    <section id="depositApprovedSection" class="sub-section">
+      <h3>Approved Deposits</h3>
+      <div id="depositApprovedList"></div>
+    </section>
+
+    <section id="depositDeclinedSection" class="sub-section">
+      <h3>Declined Deposits</h3>
+      <div id="depositDeclinedList"></div>
+    </section>
+  </div>
+
+  <!-- ========== Withdrawals Tab Content ========== -->
+  <div id="withdrawalsContent" class="tab-content">
+    <!-- Sub-Tabs -->
+    <button id="withdrawTabPending" class="sub-tab">⏳ Pending (<span id="withdrawCountPending">0</span>)</button>
+<button id="withdrawTabApproved" class="sub-tab">✅ Approved (<span id="withdrawCountTrue">0</span>)</button>
+<button id="withdrawTabDeclined" class="sub-tab">⛔ Declined (<span id="withdrawCountFalse">0</span>)</button>
+
+    <!-- Sub-Tab Sections -->
+    <section id="withdrawPendingSection" class="sub-section active">
+      <h3>Pending Withdrawals</h3>
+      <div id="withdrawPendingList"></div>
+    </section>
+
+    <section id="withdrawApprovedSection" class="sub-section">
+      <h3>Approved Withdrawals</h3>
+      <div id="withdrawApprovedList"></div>
+    </section>
+
+    <section id="withdrawDeclinedSection" class="sub-section">
+      <h3>Declined Withdrawals</h3>
+      <div id="withdrawDeclinedList"></div>
+    </section>
+  </div>
+
+  
+<!-- USERS TAB -->
+<section id="usersContent" class="tab-content hidden">
+  <h2 class="text-xl font-bold mb-4">All Users</h2>
+  <div id="usersList" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+</section>
+
+
+<!-- Chat Popup -->
+<div id="chatPopup" class="chat-popup hidden">
+  <div class="chat-box">
+    <div class="chat-header">
+      <h3 id="chatUsername">Chat with User</h3>
+      <button onclick="closeChat()" class="chat-close">✖</button>
+    </div>
+    <div id="chatMessages" class="chat-messages">
+      <p class="loading">Loading...</p>
+    </div>
+    <div class="chat-input-box">
+      <input type="text" id="chatInput" placeholder="Type a message..." />
+      <button onclick="sendChatMessage()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🔔 Notification Popup -->
+<div id="notificationPopup" class="hidden fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-white rounded-xl shadow-2xl p-6 w-[90%] max-w-md animate-slideUp">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold text-gray-800">Send Notification</h2>
+      <button onclick="closeNotificationBox()" class="text-red-500 text-xl font-bold hover:text-red-700">&times;</button>
+    </div>
+    <div class="space-y-4">
+      <input type="text" id="notifTitle" placeholder="Notification Title" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring focus:ring-blue-200">
+      <textarea id="notifMessage" placeholder="Type your message..." rows="4" class="w-full border border-gray-300 rounded-md px-4 py-2 resize-none focus:ring focus:ring-blue-200"></textarea>
+    </div>
+    <div class="mt-6 text-right">
+      <button onclick="sendNotificationMessage()" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 font-medium transition">Send</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
+

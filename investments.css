@@ -1,0 +1,1003 @@
+/* Investment Cards */
+#investmentCards {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  padding: 1rem;
+}
+
+.investment-card {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  color: #f8fafc;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.investment-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.investment-card .btc-amount {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #facc15;
+}
+
+.investment-card .usd-rate {
+  font-size: 1rem;
+  color: #94a3b8;
+}
+
+.investment-card .timestamp {
+  font-size: 0.875rem;
+  color: #cbd5e1;
+  margin-top: 1rem;
+}
+
+/* Empty Investments CTA */
+#noInvestments {
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.start-investment-btn {
+  background: linear-gradient(135deg, #1e40af, #3b82f6);
+  color: #fff;
+  font-weight: 600;
+  padding: 14px 28px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.25);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+
+
+.start-investment-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.4);
+}
+
+.start-investment-btn .rocket {
+  display: inline-block;
+  animation: floatRocket 2s infinite ease-in-out;
+}
+
+@keyframes floatRocket {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+
+/* Add the rest of your CSS content here (unchanged part) */
+
+/* Investment Popup */
+.investment-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+.investment-popup-box {
+  background: linear-gradient(145deg, #1e293b, #0f172a);
+  padding: 2rem;
+  width: 90%;
+  max-width: 420px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  animation: scaleIn 0.3s ease;
+  color: #f1f5f9;
+  position: relative;
+  overflow: hidden;
+}
+
+.popup-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #facc15;
+}
+
+.wallet-label {
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  color: #e2e8f0;
+}
+
+.popup-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  color: #fff;
+  margin-bottom: 1rem;
+  outline: none;
+}
+
+.popup-input::placeholder {
+  color: #94a3b8;
+}
+
+.btc-conversion {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.popup-btn {
+  padding: 10px 20px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s ease all;
+  font-size: 0.95rem;
+  border: none;
+}
+
+.popup-btn.cancel {
+  background: #334155;
+  color: #cbd5e1;
+}
+
+.popup-btn.cancel:hover {
+  background: #475569;
+}
+
+.popup-btn.confirm {
+  background: #22c55e;
+  color: white;
+}
+
+.popup-btn.confirm:hover {
+  background: #16a34a;
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.investment-popup-box.shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  50% { transform: translateX(8px); }
+  75% { transform: translateX(-8px); }
+  100% { transform: translateX(0); }
+}
+
+.insufficient-error {
+  color: #f87171;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-top: -8px;
+  margin-bottom: 1rem;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+#newInvestmentBtn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.hidden {
+  display: none;
+}
+.fixed-amounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.amount-btn {
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  background-color: #f3f4f6;
+  color: #333;
+  border: 1px solid #d1d5db;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+.amount-btn:hover {
+  background-color: #e5e7eb;
+}
+
+
+.shake {
+  animation: shake 0.4s ease;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-3px); }
+}
+
+.loading-bar {
+  height: 4px;
+  background: linear-gradient(to right, #4caf50, #8bc34a);
+  animation: loading 1.5s linear forwards;
+  border-radius: 5px;
+  margin-top: 15px;
+}
+@keyframes loading {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.invest-toast {
+  background: #4caf50;
+  color: #fff;
+  padding: 12px 20px;
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  transition: opacity 0.5s ease;
+  z-index: 9999;
+}
+.invest-toast.show {
+  opacity: 1;
+}
+.invest-toast.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+@keyframes fadePlan {
+  0% { opacity: 0; transform: translateY(-5px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.plan-fade {
+  animation: fadePlan 0.3s ease;
+}
+
+#errorToast {
+  background: #ef4444;
+  color: #fff;
+  padding: 12px 20px;
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  transition: opacity 0.5s ease;
+  z-index: 9999;
+}
+.plan-fade {
+  animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.amount-btn.selected {
+  background-color: #2563eb; /* or any blue you use */
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 0 0 2px #2563eb40;
+  transform: scale(1.05);
+  transition: all 0.2s ease;
+}
+.live-trade-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: linear-gradient(90deg, #00c853, #b2ff59);
+  color: #004d00;
+  font-weight: 600;
+  font-size: 0.75rem;
+  border-radius: 12px;
+  box-shadow: 0 0 6px rgba(0, 200, 83, 0.6);
+  vertical-align: middle;
+  user-select: none;
+  cursor: pointer;
+  animation: pulseGlow 2.5s infinite;
+  position: relative;
+}
+
+.live-trade-badge:hover,
+.live-trade-badge:focus {
+  box-shadow: 0 0 12px rgba(0, 200, 83, 1);
+  outline: none;
+}
+
+/* Optional tooltip styling if you want to customize it */
+.live-trade-badge[title]:hover::after,
+.live-trade-badge[title]:focus::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  font-size: 0.7rem;
+  pointer-events: none;
+  opacity: 0.9;
+  z-index: 1000;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(0, 200, 83, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(0, 200, 83, 1);
+  }
+}
+
+/* Popup modal styles */
+#liveTradePopup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  width: 320px;
+  max-width: 90%;
+  padding: 20px;
+  z-index: 2000;
+  transition: transform 0.3s ease;
+  pointer-events: none;
+  opacity: 0;
+}
+
+#liveTradePopup.active {
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+  opacity: 1;
+}
+
+#liveTradePopup h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #00c853;
+}
+
+#liveTradePopup p {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #333;
+}
+
+#liveTradePopup .close-btn {
+  display: block;
+  margin: 15px auto 0;
+  padding: 8px 15px;
+  background: #00c853;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.countdown-timer {
+  margin-top: 8px;
+  font-weight: bold;
+  color: #ff9800;
+  font-size: 0.85rem;
+}
+
+.trade-logs {
+  list-style-type: none;
+  margin-top: 8px;
+  padding-left: 0;
+  font-size: 0.8rem;
+  color: #444;
+  max-height: 80px;
+  overflow-y: auto;
+  background: #f8f8f8;
+  border-radius: 8px;
+  padding: 5px 10px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.trade-logs .log-entry {
+  animation: fadeInLog 0.5s ease-in;
+}
+
+@keyframes fadeInLog {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.progress-bar-container {
+  width: 100%;
+  height: 10px;
+  background: #e4e4e4;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00c853, #64dd17);
+  width: 0%;
+  transition: width 1s ease;
+}
+
+.log-section {
+  background: #f0f8ff;
+  padding: 6px 10px;
+  border-left: 4px solid #2196f3;
+  margin-top: 8px;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: #333;
+  animation: logFlash 0.3s ease;
+}
+
+@keyframes logFlash {
+  from { background-color: #e3f2fd; }
+  to { background-color: #f0f8ff; }
+}
+
+.countdown-timer.done {
+  color: #00c853;
+  font-weight: bold;
+}
+.log-section {
+  height: 120px;             /* Fixed height */
+  overflow-y: auto;          /* Enable vertical scrolling */
+  font-family: monospace;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  padding: 5px;
+  background: #0f172a;       /* Optional: dark terminal look */
+  border-radius: 4px;
+  border: 1px solid #1e293b;
+  color: white;
+}
+
+.log-section::-webkit-scrollbar {
+  width: 6px;
+}
+.log-section::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+.log-section::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+
+.log-line {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.log-line.buy {
+  color: #00ff88; /* Green for buy */
+}
+
+.log-line.sell {
+  color: #ff4d4d; /* Red for sell */
+}
+
+.log-line.info {
+  color: #00bfff; /* Blue for general info */
+}
+
+.log-line.warn {
+  color: #ffcc00; /* Yellow for warning */
+}
+.log-line.buy    { color: #16a34a; font-weight: bold; }
+.log-line.sell   { color: #dc2626; font-weight: bold; }
+.log-line.warn   { color: #facc15; font-weight: bold; }
+.log-line.info   { color: #60a5fa; }
+.log-line.completed { color: #22c55e; font-weight: bold; }
+.countdown-timer.done { color: #22c55e; font-weight: bold; }
+.progress-bar-fill { height: 5px; background: #16a34a; transition: width 0.5s ease-in-out; }
+.log-section { max-height: 140px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; line-height: 1.4; }
+
+
+#aiTradeLogs {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  background: #0d0d0d;
+  color: #eee;
+  padding: 10px;
+  max-height: 180px;
+  overflow-y: auto;
+  border-radius: 5px;
+}
+
+.live-earnings-box {
+  margin: 10px 0;
+  background: #0f0f0f;
+  border: 1px solid #1f1f1f;
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: inset 0 0 6px #0c0;
+  color: #00ff88;
+}
+
+.live-label {
+  font-size: 13px;
+  opacity: 0.85;
+  margin-bottom: 4px;
+}
+
+.live-earn-amount {
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.live-earn-amount.flash {
+  color: #aaffaa;
+  text-shadow: 0 0 8px #88ff88;
+}
+.flying-coin {
+  position: absolute;
+  font-size: 1.5rem;
+  pointer-events: none;
+  animation: flyUpFade 1.2s ease forwards;
+  user-select: none;
+  z-index: 9999;
+}
+
+@keyframes flyUpFade {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px) translateX(10px) scale(1.5);
+  }
+}
+
+.live-earnings-box {
+  position: relative; /* needed for flying coins absolute positioning */
+  display: inline-block;
+}
+:root {
+  --color-primary: #00c853;
+  --color-danger: #d32f2f;
+  --color-bg: #121212;
+  --color-card-bg: #1e1e1e;
+  --color-text-light: #e0e0e0;
+  --color-accent: #03dac6;
+  --color-progress-bg: #333;
+  --color-progress-fill: var(--color-primary);
+}
+
+.investment-card {
+  background: var(--color-card-bg);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  color: #f8fafc;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.investment-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 20px rgba(0, 200, 83, 0.6);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  user-select: none;
+  cursor: default;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.status-badge.live {
+  background-color: #d32f2f;
+  color: #fff;
+  animation: pulse-red 2s infinite;
+}
+
+.status-badge.completed {
+  background-color: #00c853;
+  color: #fff;
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 8px 0 rgba(211, 47, 47, 0.8); }
+  50% { box-shadow: 0 0 20px 4px rgba(211, 47, 47, 0.4); }
+}
+
+.plan-name {
+  font-size: 1.5rem;
+  margin-bottom: 16px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.investment-details > div {
+  margin-bottom: 8px;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.progress-bar-container {
+  background-color: var(--color-progress-bg);
+  border-radius: 10px;
+  height: 14px;
+  overflow: hidden;
+  margin: 16px 0;
+  width: 100%;
+}
+
+.progress-bar-fill {
+  background-color: var(--color-progress-fill);
+  height: 100%;
+  width: 0%;
+  border-radius: 10px;
+  transition: width 1s ease-in-out;
+  box-shadow: 0 0 10px var(--color-primary);
+}
+
+.log-section {
+  background-color: #262626;
+  border-radius: 10px;
+  padding: 10px;
+  height: 90px;
+  overflow-y: auto;
+  font-size: 0.9rem;
+  font-family: monospace;
+  color: #bbb;
+  margin-bottom: 16px;
+}
+
+.investment-chart {
+  width: 100% !important;
+  height: 150px !important;
+  border-radius: 12px;
+  background-color: #121212;
+  margin-bottom: 12px;
+}
+
+.earnings-box {
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--color-primary);
+  user-select: none;
+}
+
+.earnings-amount {
+  margin-left: 8px;
+  font-family: "Courier New", Courier, monospace;
+  transition: color 0.5s ease;
+}
+
+.countdown-timer {
+  font-weight: 600;
+  color: var(--color-accent);
+  font-size: 1rem;
+  user-select: none;
+}
+
+/* Animation for card fade-in and slide up */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .investment-card {
+    max-width: 100%;
+    padding: 16px;
+  }
+  .plan-name {
+    font-size: 1.25rem;
+  }
+  .investment-details > div {
+    font-size: 0.95rem;
+  }
+  .log-section {
+    height: 70px;
+    font-size: 0.85rem;
+  }
+  .investment-chart {
+    height: 120px !important;
+  }
+}
+
+
+.flying-coin {
+  position: absolute;
+  pointer-events: none;
+  font-size: 1.3rem;
+  user-select: none;
+  will-change: transform, opacity;
+  top: 0;
+  color: gold;
+  text-shadow: 0 0 4px rgba(255, 215, 0, 0.8);
+  filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.7));
+  z-index: 10;
+  animation-fill-mode: forwards;
+}
+
+.flying-coin.loss {
+  color: #ff4d4f;
+  text-shadow: 0 0 4px rgba(255, 77, 79, 0.8);
+  filter: drop-shadow(0 0 2px rgba(255, 77, 79, 0.7));
+}
+@keyframes coinBurst {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-50px) scale(1.5);
+    opacity: 0;
+  }
+}
+
+.coin-burst {
+  pointer-events: none;
+  position: absolute;
+  animation: coinBurst 0.8s ease-out forwards;
+  color: gold;
+  text-shadow: 0 0 4px #ffd700;
+}
+.queued-waiting {
+  color: orange;
+  font-weight: 500;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+.log-line.completed {
+  color: #00e676;
+  font-weight: bold;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.deposit-item {
+  border: 1px solid #ccc;
+  padding: 14px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: #121212;
+  color: #fff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.03);
+  transition: all 0.3s ease;
+}
+.deposit-item:hover {
+  transform: scale(1.01);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+}
+.empty-note {
+  text-align: center;
+  font-style: italic;
+  color: #888;
+  margin-top: 20px;
+}
+.deposit-tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.tab {
+  padding: 10px 20px;
+  background: #111;
+  color: white;
+  border-radius: 30px;
+  cursor: pointer;
+  border: 1px solid #333;
+  transition: all 0.3s;
+}
+
+.tab.active {
+  background: #2196f3;
+  box-shadow: 0 0 10px #2196f3aa;
+}
+
+.deposit-pane {
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.deposit-pane.active {
+  display: flex;
+}
+
+.deposit-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  backdrop-filter: blur(10px);
+  animation: fadeInUp 0.5s ease;
+  position: relative;
+}
+
+.deposit-card:hover {
+  transform: scale(1.02);
+}
+
+.status-tag {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.status-pending { background: #fbc02d; color: #111; }
+.status-approved { background: #4caf50; color: white; }
+.status-declined { background: #e53935; color: white; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.deposit-pane {
+  display: none;
+}
+
+.deposit-pane.active {
+  display: block;
+}
+.atm-balance.shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmerMove 0.6s ease-out;
+}
+
+@keyframes shimmerMove {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+.earnings-chart {
+  width: 100%;
+  height: 100px;
+  margin-top: 10px;
+}
+.log-completed {
+  background-color: #f3f3f3;
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
+  font-style: italic;
+}
+
+.earnings-completed {
+  background-color: #eee;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+.funding-animate {
+  animation: pulseExit 0.7s ease-out forwards;
+}
+
+@keyframes pulseExit {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+}
+.copy-text {
+  background-color: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-block;
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+.deposit-item {
+  border-left: 4px solid #2ecc71;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.deposit-card {
+  transition: all 0.3s ease;
+}
+.copy-text {
+  cursor: pointer;
+}

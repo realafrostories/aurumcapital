@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AurumCapital Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="investments.css" />
+  <link rel="stylesheet" href="withdrawals.css" />
+  <link rel="stylesheet" href="chatroom.css" />
+  <link rel="icon" href="logo.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</head>
+<body>
+
+
+
+  <div id="toastContainer" class="toast-container"></div>
+  <div id="loadingOverlay" class="hidden">Logging out...</div>
+<div class="live-rates-bar" id="liveRatesBar">
+  <div class="crypto-rate btc">BTC <span class="price" id="btcPrice">$0.00</span></div>
+  <div class="crypto-rate">USDT <span class="price" id="usdtPrice">$0.00</span></div>
+  <div class="crypto-rate">LTC <span class="price" id="ltcPrice">$0.00</span></div>
+  <div class="crypto-rate">ETH <span class="price" id="ethPrice">$0.00</span></div>
+  <div class="crypto-rate">BNB <span class="price" id="bnbPrice">$0.00</span></div>
+</div>
+  <header class="dashboard-header">
+  <div class="header-left-group">
+    <!-- Sidebar Toggle Icon (already working) -->
+
+
+    <div class="greeting" id="greetingText">Good day ☀️🌤️🌙</div>
+    <div class="atm-card" id="atmCard">
+      <div class="atm-balance-label">Live<br/>Balance</div>
+      <div class="atm-balance" id="userBalance"></div>
+      <button class="add-funds-text-btn" id="addFundsBtn">+ Fund</button>
+    </div>
+  </div>
+  <div class="user-controls">
+    <!-- Profile Verification Notice -->
+<div class="verify-notice hidden" id="verify-notice">
+  <span id="verificationNotice" class="verification-status"></span>
+
+</div>
+
+<!-- Notification Bell -->
+<div class="notification-container">
+  <div class="notification-bell" id="notificationBell">
+    🔔
+    <span id="notifCount" class="notif-badge hidden"></span>
+    <div id="notifSideAlert" class="notif-alert hidden">New Notification</div>
+  </div>
+
+  <div class="notif-popup hidden" id="notifPopup">
+    <div class="notif-header">Notifications</div>
+    <ul id="notifList" class="notif-list">
+      <!-- Fetched notifications go here -->
+    </ul>
+  </div>
+</div>
+
+    <div class="profile-container">
+      <img src="https://img.freepik.com/premium-vector/silver-membership-icon-default-avatar-profile-icon-membership-icon-social-media-user-image-vector-illustration_561158-4215.jpg" 
+      class="avatar" id="userAvatar" />
+      <span id="prof-verified-badge" class="prof-verified-badge hidden">✔</span>
+      <label id="openUserAvatarModalBtn" class="edit-icon">✏️</label>
+      <input type="file" id="avatarUpload" class="hidden" />
+    </div>
+
+<!-- Avatar Selection Modal -->
+<div id="userAvatarModal" class="user-avatar-modal">
+  <div class="user-avatar-content">
+    <span id="closeUserAvatarModalBtn" class="user-avatar-close">❌</span>
+    <h3>Select Your Avatar</h3>
+    <p class="user-avatar-note">
+    🔒 <strong>Why Use an Avatar?</strong><br>
+    At AurumCapital, we prioritize your <strong>privacy and security</strong>. Instead of requiring personal photos, we use unique anime-style avatars to help protect your <strong>identity and confidential information</strong>. This ensures a safe, anonymous, and professional experience while maintaining a friendly community feel.
+  </p>
+  <div id="saveAvatarSection" class="user-avatar-save" style="display: none;">
+  <button id="confirmAvatarBtn" class="save-avatar-btn">Save Avatar</button>
+  <div id="avatarSavingSpinner" class="avatar-spinner" style="display: none;">
+    <div class="spinner"></div>
+    <p>Updating your profile picture...</p>
+  </div>
+  <!-- Success animation -->
+<div id="avatarSaveSuccess" class="avatar-save-success" style="display:none;">
+  <!-- Animated green circle + check -->
+  <svg class="success-check" viewBox="0 0 52 52">
+    <circle class="success-check-circle" cx="26" cy="26" r="25" fill="none"/>
+    <path class="success-check-mark" fill="none" d="M14 27l7 7 17-17"/>
+  </svg>
+  <p>Profile picture updated!</p>
+</div>
+</div>
+
+    <div id="userAvatarGrid" class="user-avatar-grid"></div>
+
+  </div>
+</div>
+
+    
+    <div class="logout-icon-wrapper">
+  <div id="logoutBtn" class="logout-icon" title="Logout">
+    <svg viewBox="0 0 24 24" fill="none" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16 17L21 12L16 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M21 12H9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M4 4H12C13.1046 4 14 4.89543 14 6V10" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M14 14V18C14 19.1046 13.1046 20 12 20H4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <span class="tooltip-text">Logout</span>
+</div>
+
+  </div>
+</header>
+
+<div id="sidebarOverlay" class="sidebar-overlay hidden"></div>
+
+<!-- Sidebar Panel -->
+<div id="sidebar" class="sidebar hidden">
+  <div class="sidebar-header">BitFidelity</div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+    <a href="deposit.html"><i class="fas fa-wallet"></i> Deposit</a>
+    <a href="withdraw.html"><i class="fas fa-money-bill-wave"></i> Withdraw</a>
+    <a href="edit_profile.html"><i class="fas fa-user-cog"></i> Profile</a>
+    <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </nav>
+</div>
+
+
+
+  <!-- Leaderboard Section -->
+<div class="leaderboard-container" >
+  <div class="leaderboard-toggle-wrapper">
+  <button id="leaderboardToggleBtn" class="leaderboard-toggle-btn" aria-label="Toggle Leaderboard">
+    <span class="arrow-icon">▲</span>
+    <span class="toggle-text" id="leaderboardTitle">Our Top Investors</span>
+  </button>
+</div>
+
+
+    <div class="leaderboard-scroll" aria-label="Top investors leaderboard" id="leaderboardScroll">
+
+      <!-- Investor cards with verified badges -->
+<div class="investor-card top-investor" tabindex="0">
+  <div class="investor-rank">#1</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://cdnb.artstation.com/p/assets/images/images/037/250/389/large/jaqen-art-self-genshin.jpg?1619888825" alt="Investor #15 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Emsa****</div>
+  <div class="investor-amount">$521.7M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#2</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://www.shutterstock.com/image-vector/digital-painting-boy-anime-style-600nw-2302127233.jpg" alt="Investor #14 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Liau****</div>
+  <div class="investor-amount">$333.1M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#3</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://api.dicebear.com/7.x/avataaars/svg?seed=SatoshiAI" alt="Investor #13 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Oliv******</div>
+  <div class="investor-amount">$200M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#4</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://media.craiyon.com/2025-04-07/S9QyJvP7Rya9oBiXmGXnNw.webp" alt="Investor #12 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Noav***</div>
+  <div class="investor-amount">$130M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#5</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://static.vecteezy.com/system/resources/thumbnails/036/434/388/small_2x/anime-cute-girl-face-portrait-cartoon-character-illustration-vector.jpg" alt="Investor #11 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Soph*********</div>
+  <div class="investor-amount">$92M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#6</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://api.dicebear.com/7.x/avataaars/svg?seed=LunaCrypto" alt="Investor #10 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Jame***</div>
+  <div class="investor-amount">$75.5M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#7</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" 
+    src="https://api.dicebear.com/7.x/avataaars/svg?seed=MochiDrop" alt="Investor #9 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Isob********</div>
+  <div class="investor-amount">$41M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#8</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://api.dicebear.com/7.x/avataaars/svg?seed=SenpaiHodl" alt="Investor #8 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Bente******</div>
+  <div class="investor-amount">$22.2M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#9</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://img.freepik.com/premium-vector/anime-girl-cartoon-character-illustration-manually-created_648489-206.jpg" alt="Investor #7 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Mial*******</div>
+  <div class="investor-amount">$11.6M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#10</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://media.craiyon.com/2025-04-07/Fkt_6APEQk6mHHwfezZ9aQ.webp" alt="Investor #6 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Elis***</div>
+  <div class="investor-amount">$4.5M</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#11</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://api.dicebear.com/7.x/avataaars/svg?seed=CryptoTenshi" alt="Investor #5 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Amel***</div>
+  <div class="investor-amount">$990K</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#12</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVfg2Q-Y-edpyFk1LUmv1yR6TrwXZDp0GYTg&s" alt="Investor #4 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Will********</div>
+  <div class="investor-amount">$712K</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#13</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://api.dicebear.com/7.x/avataaars/svg?seed=NekoTrader" alt="Investor #3 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Char*****</div>
+  <div class="investor-amount">$504K</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#14</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" src="https://anidreams.com/wp-content/uploads/2024/07/indian-characters-in-anime-featured-image.webp" alt="Investor #2 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Zame******</div>
+  <div class="investor-amount">$480K</div>
+</div>
+
+<div class="investor-card" tabindex="0">
+  <div class="investor-rank">#15</div>
+  <div class="photo-wrapper">
+    <img class="investor-photo" 
+    src="https://api.dicebear.com/7.x/avataaars/svg?seed=MidoriKaze" alt="Investor #1 photo" />
+    <span class="verified-badge">✔</span>
+  </div>
+  <div class="investor-name">Alep****</div>
+  <div class="investor-amount">$455K</div>
+</div>
+
+
+
+    </div>
+  </div>
+
+ <!-- TABS NAVIGATION -->
+<div class="dashboard-tabs">
+  <button class="tab-btn active" data-tab="investments">
+    <i class="fas fa-chart-line"></i> <span>Investments</span>
+  </button>
+  <button class="tab-btn" data-tab="deposits">
+    <i class="fas fa-wallet"></i> <span>Deposits</span>
+  </button>
+  <button class="tab-btn" data-tab="withdrawals">
+    <i class="fas fa-hand-holding-usd"></i> <span>Withdrawals</span>
+  </button>
+  <button class="tab-btn" data-tab="chat">
+    <i class="fas fa-comments"></i> <span>Live Chat</span>
+    
+</p>
+  </button>
+</div>
+
+<!-- TABS CONTENT -->
+<div class="tab-content">
+    <div id="investments" class="tab-pane active">
+      <section id="investmentsPane" class="p-4">
+        <div id="investmentCards" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+        <div id="noInvestments" class="hidden text-center py-12">
+          <h2 class="text-xl font-semibold text-gray-600 mb-4">You have no active investments</h2>
+          <button id="startInvestingBtn" class="start-investment-btn">
+  <span class="rocket">🚀</span> Start Your Investment
+</button>
+
+        </div>
+      </section></div>
+  <div id="deposits" class="tab-pane"> 
+  <div class="deposit-tabs">
+    <div id="noDeposits" class="hidden text-center py-12">
+          <h2 class="text-xl font-semibold text-gray-600 mb-4">You have made no deposits</h2>
+          <button id="fundwalletBtn" class="fund-wallet-btn">
+  <span class="rocket"></span> Fund Your Wallet
+</button>
+
+        </div>
+    <button class="tab active" data-tab="pending">⏳ Pending</button>
+    <button class="tab" data-tab="approved">✅ Approved</button>
+    <button class="tab" data-tab="declined">❌ Declined</button>
+  </div>
+
+  <!-- Deposit panes -->
+  <div class="deposit-content">
+    <div id="pendingPane" class="deposit-pane active"></div>
+    <div id="approvedPane" class="deposit-pane"></div>
+    <div id="declinedPane" class="deposit-pane"></div>
+  </div>
+ </div>
+  <!-- Withdraw Tab Container -->
+<div id="withdrawals" class="tab-pane p-4">
+  <div class="text-center mb-6">
+<div id="withdrawTriggerContainer" class="flex justify-end">
+  <button id="openWithdrawPopup" class="withdraw-btn">Withdraw Funds</button>
+</div>
+<!-- Withdraw Popup -->
+<div id="withdrawPopup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="withdraw-card bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative animate-popup">
+    <button id="closeWithdrawPopup" class="close-btn absolute top-2 right-2 text-gray-400 hover:text-red-500 transition">✖</button>
+
+    <h2 class="text-xl font-bold text-blue-600 mb-2">Withdraw Funds</h2>
+    <p class="text-sm text-green-600 font-medium mb-4" >Wallet Balance: <span id="userBalanceText">$0.00</span></p>
+
+    <form id="withdrawForm" class="space-y-4">
+
+      <div class="flex items-center justify-end mb-3 gap-2 text-sm font-medium text-gray-700">
+  <div class="toggle-mode-switch mb-4">
+  <span class="toggle-label">Input in:</span>
+  <div class="toggle-group" id="toggleModeGroup">
+    <input type="radio" id="modeUSD" name="inputMode" value="usd" checked />
+    <label for="modeUSD">USD</label>
+
+    <input type="radio" id="modeBTC" name="inputMode" value="btc" />
+    <label for="modeBTC">BTC</label>
+  </div>
+</div>
+</div>
+      <div id="usdWrapper">
+        <label class="block text-sm font-medium text-gray-700" id="pTxt">Amount (USD)</label>
+        <input type="number" id="withdrawAmountUSD" class="w-full px-4 py-2 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500" min="10">
+      <p class="min-note text-xs text-red-500 font-medium"></p>
+      </div>
+
+      <div id="btcWrapper">
+        <label class="block text-sm font-medium text-gray-700" id="pTxt">Amount (BTC)</label>
+        <input type="number" id="withdrawAmountBTC" class="w-full px-4 py-2 rounded border focus:outline-none focus:ring-2 focus:ring-blue-500" novalidate
+        step="0.00000001"    min="0">
+      <p class="min-note text-xs text-red-500 font-medium"></p>
+      </div>
+
+      <p class="text-xs text-gray-500 italic" id="wtext"><b>Note: </b>We charge a 15% fee per withdraw, which includes tax & dynamic network fees. Withdrawals within the proper 5 business/working days takes up to 24hours to reflect, otherwise expect extra delay</p>
+
+      <div class="wallet-input-wrapper">
+  <label for="withdrawWallet" class="wallet-label">BTC Wallet Address</label>
+  <div class="wallet-input-container">
+    <input
+      type="text"
+      id="withdrawWallet"
+      class="wallet-input"
+      required
+    />
+    <button id="pasteWalletBtn" class="paste-btn" title="Paste">📋</button></div></div>
+
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">Submit Withdrawal</button>
+    </form>
+  </div>
+</div>
+
+
+  <!-- Withdrawals List -->
+<div id="withdrawalsList" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-6"></div>
+
+</div>
+</div>
+
+
+  <div id="chat" class="tab-pane">
+  <div class="chat-options-container">
+    <!-- Community Chat Card -->
+    <div class="chat-card pulse-card">
+      <div class="icon">👥</div>
+      <h3>Online Community</h3>
+      <p>Join our open community room and connect with other users in real time.</p>
+      <button id="enterChatRoomBtn" class="chat-room-btn">💬 Enter Chat Room</button>
+    </div>
+
+    <!-- Live Support Card -->
+    <div class="chat-card pulse-card">
+      <div class="icon">🎧</div>
+      <h3>Live Support</h3>
+      <p>Chat with our support team if you need help with your account or transactions.</p>
+      <button id="chatSupportBtn">Chat with Support</button>
+
+  </div>
+
+  <div class="chat-card pulse-card">
+      <div class="icon"><img src="https://cdn-icons-png.flaticon.com/512/4264/4264838.png" height="60px" width="60px"/></div>
+      <h3>Try Your Luck</h3>
+      <p>You could get lucky with our Top-Investors.</p>
+      <button id="luckBtn" class="lckbtn">Coming Soon</button>
+
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+<audio id="chatSound" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
+
+<!-- Investment Popup Modal -->
+<div id="investmentPopup" class="investment-popup hidden">
+  <div class="investment-popup-box">
+    <h2 class="popup-title">Start An Investment</h2>
+    <p class="wallet-label">Wallet Balance: <strong id="walletUsdPopup">$0.00</strong></p>
+    <input type="number" id="investAmount" class="popup-input" min="100" value="100" placeholder="Amount in USD (min $100)" />
+    <div id="selectedPlanName" class="font-semibold text-base text-blue-600 mt-2"></div>
+    <div id="planReturnRate" class="text-gray-600"></div>
+    <div id="planInfo" class="hidden text-sm mt-2 transition-opacity duration-300"></div>
+    <p class="btc-conversion">≈ <span id="btcPreview">0 BTC</span></p>
+
+    <label for="planDuration" class="wallet-label">Select Plan Duration</label>
+<select id="planDuration" class="popup-input" required>
+  <option value="">-- Select Duration --</option>
+  <option value="1d">24 Hours</option>
+  <option value="1w">1 Week</option>
+  <option value="1m">1 Month</option>
+  <option value="3m">3 Months</option>
+  <option value="6m">6 Months</option>
+  <option value="12m">1 Year</option>
+</select>
+<div id="durationError" class="insufficient-error hidden">⚠️ Please select a plan duration</div>
+
+
+    <div class="popup-actions">
+      <button id="cancelInvestBtn" class="popup-btn cancel">Cancel</button>
+      <button id="confirmInvestBtn" class="popup-btn confirm">Confirm</button>
+    </div>
+    <!-- Fixed Amount Buttons -->
+<div id="fixedAmounts" class="fixed-amounts-grid">
+  <button class="amount-btn" data-value="100">$100</button>
+  <button class="amount-btn" data-value="500">$500</button>
+  <button class="amount-btn" data-value="1000">$1,000</button>
+  <button class="amount-btn" data-value="3000">$3,000</button>
+  <button class="amount-btn" data-value="5000">$5,000</button>
+  <button class="amount-btn" data-value="10000">$10,000</button>
+  <button class="amount-btn" data-value="20000">$20,000</button>
+  <button class="amount-btn" data-value="50000">$50,000</button>
+  <button class="amount-btn" data-value="100000">$100,000</button>
+  <button class="amount-btn" data-value="300000">$300,000</button>
+  <button class="amount-btn" data-value="500000">$500,000</button>
+  <button class="amount-btn" data-value="1000000">$1,000,000</button>
+</div>
+
+<!-- Loading Bar -->
+<div id="investLoadingBar" class="loading-bar hidden"></div>
+
+<!-- Toast Message -->
+<div id="investToast" class="invest-toast hidden">🎉 Investment Successful!</div>
+<div id="errorToast" class="invest-toast hidden"></div>
+
+
+<!-- Audio -->
+<audio id="successSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3f493f8b35.mp3" preload="auto"></audio>
+
+<div id="confettiBurst" style="position:fixed;pointer-events:none;top:50%;left:50%;transform:translate(-50%, -50%);font-size:50px;display:none;z-index:9999;">🎊🎉✨</div>
+
+  </div>
+  
+</div>
+<div id="liveTradePopup" role="dialog" aria-modal="true" aria-labelledby="liveTradeTitle" aria-describedby="liveTradeDesc" class="hidden">
+  <h3 id="liveTradeTitle">Live in Trade</h3>
+  <p id="liveTradeDesc">
+    Our AI has started trading with your investment actively. The profits and trade status are updated in real-time to maximize your returns.
+  </p>
+  <button class="close-btn" aria-label="Close Live in Trade info">Close</button>
+</div>
+
+<button class="start-investment-btn hidden" id="newInvestmentBtn">
+  <span class="rocket">🚀</span> New Investment
+</button>
+
+<div id="toastContainer" class="fixed top-6 right-6 z-[1000] space-y-3 max-w-sm w-full"></div>
+
+
+<!-- Blocked Overlay -->
+<div id="blockedOverlay" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-md z-[9999] flex items-center justify-center hidden">
+  <div class="bg-white p-8 rounded-xl shadow-xl max-w-md w-full text-center animate-fade-in">
+    <h2 class="text-2xl font-bold text-red-600 mb-4">🚫 Account Blocked</h2>
+    <p class="text-gray-700 mb-6">
+      We noticed unusual activities on your account and your account has been <strong>temporarily Suspended</strong>.
+      <br><br>
+      Please contact live support to rectify the issue.
+    </p>
+    <button id="openSupportBtn" class="px-6 py-2 bg-gradient-to-r from-red-500 to-red-700 text-white rounded-full font-semibold text-sm shadow-md animate-pulse hover:scale-105 transition">
+      💬 Contact Support
+    </button>
+  </div>
+</div>
+
+<!-- 💬 Support Chat Modal -->
+<div id="supportModal" class="support-modal">
+  <div class="support-header">
+    <div class="agent-info">
+      <img src="https://www.shutterstock.com/image-vector/support-icon-can-be-used-600nw-1887496465.jpg" class="agent-avatar" />
+      <span class="agent-name">Support Agent</span>
+      <span class="online-dot"></span>
+    </div>
+    <button id="closeSupportModal">✖</button>
+  </div>
+
+  <div id="chatMessages" class="chat-body"></div>
+
+  <form id="chatForm" class="chat-input-bar">
+    <input type="text" id="chatInput" placeholder="Type your message..." autocomplete="off" />
+    <button type="submit">Send</button>
+  </form>
+</div>
+
+
+<!-- Overlay with blur effect -->
+<div id="chatRoomModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="chat-header">
+      
+      <h3>BF Chat Room</h3>
+      <div class="online-status">
+  <span id="onlineCount">📡 0 users online</span>
+</div>
+      <button id="closeChatRoom">&times;</button>
+    </div>
+    <div id="chatBody" class="chat-body"></div>
+    <form id="userInputForm" class="chat-input-form">
+      <input id="userMessage" autocomplete="off" placeholder="Type your message..." />
+      <div class="emoji-dropdown">
+  <button type="button" id="emojiToggle">😊</button>
+  
+</div>
+
+      <button type="submit">Send</button>
+    </form>
+  </div>
+  <button id="scrollToBottomBtn" style="display:none; position:absolute; bottom: 60px; right: 20px; z-index:1000;">
+  ↓ Scroll to bottom
+</button>
+<div class="emoji-picker" id="emojiPicker">
+    <div class="emoji-tabs">
+      <button data-tab="smileys">😄</button>
+      <button data-tab="symbols">💡</button>
+      <button data-tab="food">🍔</button>
+      <button data-tab="travel">✈️</button>
+      <button data-tab="flags">🏳️</button>
+    </div>
+    <div class="emoji-content" id="emojiContent"></div>
+  </div>
+</div>
+
+
+
+<!-- Bitcoin Earnings Chart Section (Footer) -->
+<div class="user-earnings-section">
+  <div class="chart-controls">
+    <button id="toggleChartTypeBtn">Switch to Bar Chart</button>
+  <button id="toggleCurrencyBtn">Switch to BTC</button>
+  <button id="setTargetBtn">Set Target</button>
+  <button id="downloadChartBtn">Download Chart</button>
+</div>
+
+  <h3>Your Earnings Overview (USD)</h3>
+  <div id="totalEarningsDisplay">Total Earned: <span class="usd-amount">$0.00</span></div>
+  <canvas id="btcEarningsChart" height="300"></canvas>
+  <p id="noEarningsMsg" class="no-earnings-msg">No earnings data yet. Start investing to see results here!</p>
+
+</div>
+
+
+
+<div class="badge-list">
+  <div class="badge" data-key="firstInvestment" id="first-investment">
+    <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="First Investment">
+    <span>First Investment</span>
+  </div>
+
+  <div class="badge" data-key="earned5k" id="earn-5k">
+    <img src="https://cdn-icons-png.flaticon.com/512/2583/2583337.png" alt="$5K Earned">
+    <span>Earned $5,000</span>
+  </div>
+
+  <div class="badge" data-key="earned10k" id="earn-10k">
+    <img src="https://cdn-icons-png.flaticon.com/512/2583/2583334.png" alt="$10K Earned">
+    <span>Earned $10,000</span>
+  </div>
+
+  <div class="badge" data-key="streak7" id="login-streak">
+    <img src="https://cdn-icons-png.flaticon.com/512/1000/1000981.png" alt="7 Day Streak">
+    <span>7-Trade Streak</span>
+  </div>
+
+  <!-- 🔥 New Badges Below -->
+
+  <div class="badge" data-key="first-week-complete" id="first-week-complete">
+    <img src="https://cdn-icons-png.flaticon.com/512/3771/3771585.png" alt="First Week Completed">
+    <span>Completed First Week</span>
+  </div>
+
+  <div class="badge" data-key="consistent-investor" id="consistent-investor">
+    <img src="https://cdn-icons-png.flaticon.com/512/4202/4202846.png" alt="Consistent Investor">
+    <span>Consistent Investor</span>
+  </div>
+
+  <div class="badge" data-key="high-roller" id="high-roller">
+    <img src="https://cdn-icons-png.flaticon.com/512/3064/3064734.png" alt="High Roller">
+    <span>High Roller ($50k+)</span>
+  </div>
+
+  <div class="badge" data-key="early-bird" id="early-bird">
+    <img src="https://cdn-icons-png.flaticon.com/512/3208/3208725.png" alt="Early Bird">
+    <span>Early Bird Investor</span>
+  </div>
+</div>
+
+
+<div id="badgeToast" class="badge-toast hidden">
+  <img id="toastIcon" src="" alt="Badge Icon">
+  <div>
+    <strong>New Badge Unlocked!</strong>
+    <p id="toastText">You earned a new badge</p>
+  </div>
+</div>
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.2/dist/index.min.js"></script>
+
+  <script type="module" src="dashboard.js"></script>
+  <script type="module" src="support.js"></script>
+  <script type="module" src="chatroom.js"></script>
+  <script type="module" src="investments.js"></script>
+</body>
+<footer class="site-footer">
+  <div class="footer-content container">
+    <div class="footer-brand">
+      <img src="logo.png" alt="BitFidelity Logo" class="footer-logo">
+      <p class="footer-tagline">AI-powered crypto investing platform for a smarter future.</p>
+    </div>
+
+    <div class="footer-links">
+      <div class="link-column">
+        <h4>Product</h4>
+        <a href="#">Features</a>
+        <a href="#">Pricing</a>
+        <a href="#">Security</a>
+      </div>
+      <div class="link-column">
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">Careers</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="link-column">
+        <h4>Resources</h4>
+        <a href="#">Blog</a>
+        <a href="#">Help Center</a>
+        <a href="#">Docs</a>
+      </div>
+    </div>
+
+    <div class="footer-social">
+      <h4>Connect</h4>
+      <div class="social-icons">
+        <a href="https://x.com/official_bitfidelity"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="https://discord.com/bit_fidelity100"><i class="fa-brands fa-discord"></i></a>
+        <a href="https://telegram.com/bit-fidelity-tm"><i class="fa-brands fa-telegram"></i></a>
+        <a href="https://github.com/bit-fidelity"><i class="fa-brands fa-github"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2025 AurumCapital. All rights reserved.</p>
+    <div class="legal-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Use</a>
+    </div>
+  </div>
+</footer>
+</html>
+
+
+
+
+
+
+
+
+
+

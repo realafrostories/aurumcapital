@@ -1,0 +1,123 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #0f1116;
+  color: #f1f1f1;
+  line-height: 1.6;
+  padding: 0 1rem;
+}
+
+.lang-select {
+  margin-top: 1rem;
+  text-align: right;
+}
+
+.lang-select select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #1c1e25;
+  color: white;
+  border: 1px solid #444;
+}
+
+.site-header {
+  text-align: center;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.site-header h1 {
+  font-size: 2.2rem;
+  color: #00ffc3;
+}
+
+.effective-date {
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.main-content {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding-bottom: 5rem;
+}
+
+.toc {
+  position: sticky;
+  top: 100px;
+  background: rgba(17, 20, 26, 0.8);
+  border: 1px solid #333;
+  padding: 16px;
+  border-radius: 8px;
+  width: 250px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 0 12px rgba(0, 255, 196, 0.1);
+}
+
+.toc h2 {
+  margin-top: 0;
+  font-size: 1rem;
+  color: #00ffc3;
+}
+
+.toc ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc ul li {
+  margin: 8px 0;
+}
+
+.toc ul li a {
+  color: #bbb;
+  text-decoration: none;
+  font-size: 0.92rem;
+  transition: color 0.2s ease;
+}
+
+.toc ul li a:hover {
+  color: #00ffc3;
+}
+
+.terms-container {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid #222;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(0, 255, 196, 0.05);
+}
+
+.terms-container h2 {
+  margin-top: 30px;
+  font-size: 1.4rem;
+  color: #00ffc3;
+}
+
+.terms-container p {
+  margin-top: 12px;
+  font-size: 1rem;
+  color: #e3e3e3;
+}
+
+@media screen and (max-width: 900px) {
+  .main-content {
+    flex-direction: column;
+  }
+
+  .toc {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .lang-select {
+    text-align: left;
+  }
+}
