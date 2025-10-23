@@ -16,12 +16,12 @@ const translations = {
       {
         id: "overview",
         heading: "1. Overview",
-        content: `These Terms of Use govern your access to and use of AurumCapital, including our AI-powered crypto trading features.`
+        content: `These Terms of Use govern your access to and use of AurumCaptial, including our AI-powered crypto trading features.`
       },
       {
         id: "eligibility",
         heading: "2. Eligibility",
-        content: `To use AurumCapital, you must be 18 or older and comply with local financial regulations.`
+        content: `To use AurumCaptial, you must be 18 or older and comply with local financial regulations.`
       },
       {
         id: "account",
@@ -31,7 +31,7 @@ const translations = {
       {
         id: "ai-trading",
         heading: "4. AI-Powered Trading",
-        content: `AurumCapital executes trades on your behalf using real-time data, strategies from expert traders, and proprietary AI models.`
+        content: `AurumCaptial executes trades on your behalf using real-time data, strategies from expert traders, and proprietary AI models.`
       },
       {
         id: "risks",
@@ -46,7 +46,7 @@ const translations = {
       {
         id: "termination",
         heading: "7. Termination",
-        content: `AurumCapital reserves the right to suspend or terminate accounts that violate our policies or are flagged for suspicious activity.`
+        content: `AurumCaptial reserves the right to suspend or terminate accounts that violate our policies or are flagged for suspicious activity.`
       },
       {
         id: "dispute",
@@ -73,12 +73,12 @@ const translations = {
       {
         id: "overview",
         heading: "1. Vue d'ensemble",
-        content: `Ces conditions régissent votre utilisation de AurumCapital, y compris ses fonctionnalités de trading crypto alimentées par l'IA.`
+        content: `Ces conditions régissent votre utilisation de AurumCaptial, y compris ses fonctionnalités de trading crypto alimentées par l'IA.`
       },
       {
         id: "eligibility",
         heading: "2. Admissibilité",
-        content: `Pour utiliser AurumCapital, vous devez avoir 18 ans ou plus et respecter les lois locales.`
+        content: `Pour utiliser AurumCaptial, vous devez avoir 18 ans ou plus et respecter les lois locales.`
       },
       {
         id: "account",
@@ -88,7 +88,7 @@ const translations = {
       {
         id: "ai-trading",
         heading: "4. Trading IA",
-        content: `AurumCapital effectue des transactions en votre nom à l’aide de données en temps réel et de modèles IA propriétaires.`
+        content: `AurumCaptial effectue des transactions en votre nom à l’aide de données en temps réel et de modèles IA propriétaires.`
       },
       {
         id: "risks",
@@ -103,7 +103,7 @@ const translations = {
       {
         id: "termination",
         heading: "7. Résiliation",
-        content: `AurumCapital peut suspendre ou résilier tout compte enfreignant ses règles ou suspecté d’activité frauduleuse.`
+        content: `AurumCaptial peut suspendre ou résilier tout compte enfreignant ses règles ou suspecté d’activité frauduleuse.`
       },
       {
         id: "dispute",
@@ -118,7 +118,7 @@ const translations = {
       {
         id: "contact",
         heading: "10. Contact",
-        content: `Des questions ? Écrivez-nous à support@AurumCapital.com.`
+        content: `Des questions ? Écrivez-nous à support@AurumCaptial.com.`
       }
     ]
   }

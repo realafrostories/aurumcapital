@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AurumCapital Dashboard</title>
+  <title>AurumCaptial Dashboard</title>
   <link rel="stylesheet" href="dashboard.css" />
   <link rel="stylesheet" href="investments.css" />
   <link rel="stylesheet" href="withdrawals.css" />
   <link rel="stylesheet" href="chatroom.css" />
   <link rel="icon" href="logo.png" type="image/png">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -77,7 +77,7 @@
     <h3>Select Your Avatar</h3>
     <p class="user-avatar-note">
     🔒 <strong>Why Use an Avatar?</strong><br>
-    At AurumCapital, we prioritize your <strong>privacy and security</strong>. Instead of requiring personal photos, we use unique anime-style avatars to help protect your <strong>identity and confidential information</strong>. This ensures a safe, anonymous, and professional experience while maintaining a friendly community feel.
+    At AurumCaptial, we prioritize your <strong>privacy and security</strong>. Instead of requiring personal photos, we use unique anime-style avatars to help protect your <strong>identity and confidential information</strong>. This ensures a safe, anonymous, and professional experience while maintaining a friendly community feel.
   </p>
   <div id="saveAvatarSection" class="user-avatar-save" style="display: none;">
   <button id="confirmAvatarBtn" class="save-avatar-btn">Save Avatar</button>
@@ -121,7 +121,7 @@
 
 <!-- Sidebar Panel -->
 <div id="sidebar" class="sidebar hidden">
-  <div class="sidebar-header">BitFidelity</div>
+  <div class="sidebar-header">AurumCaptial</div>
   <nav class="sidebar-nav">
     <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
     <a href="deposit.html"><i class="fas fa-wallet"></i> Deposit</a>
@@ -609,6 +609,29 @@
 </div>
 
 
+<div class="referral-card bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 text-white rounded-2xl shadow-xl p-6 flex flex-col gap-3 max-w-md mx-auto">
+  <h2 class="text-xl font-bold flex items-center gap-2">
+    💎 Referral Program
+  </h2>
+  <p class="text-sm opacity-90">Invite friends and earn $50 when they join!</p>
+
+  <div class="flex items-center gap-2 mt-3">
+    <input id="referralLink" readonly class="flex-grow bg-white text-gray-800 px-3 py-2 rounded-md font-mono text-sm" />
+    <button id="copyReferralBtn" class="bg-white/20 hover:bg-white/30 text-white font-semibold px-4 py-2 rounded-md">Copy</button>
+  </div>
+
+  <div class="flex justify-between mt-4 text-sm font-semibold">
+    <span>👥 Total Referrals:</span>
+    <span id="referralCount">0</span>
+  </div>
+
+  <div class="flex justify-between text-sm font-semibold">
+    <span>💰 Wallet Balance:</span>
+    <span id="walletBalance">$0</span>
+  </div>
+</div>
+
+
 
 <!-- Bitcoin Earnings Chart Section (Footer) -->
 <div class="user-earnings-section">
@@ -682,6 +705,74 @@
 </div>
 
 
+<!-- 🎉 Confetti Canvas -->
+<canvas id="confettiCanvas" class="fixed inset-0 w-full h-full pointer-events-none z-40"></canvas>
+
+<!-- ✅ Confetti Script -->
+<script>
+function launchConfetti() {
+  const canvas = document.getElementById("confettiCanvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const confetti = [];
+  const colors = ["#FFD700", "#FFEA00", "#FFF8DC", "#E6BE8A", "#FFB700"];
+
+  for (let i = 0; i < 200; i++) {
+    confetti.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      r: Math.random() * 6 + 2,
+      d: Math.random() * 0.5 + 0.5,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      tilt: Math.random() * 10 - 10,
+      tiltAngleIncrement: Math.random() * 0.07 + 0.05,
+      tiltAngle: 0
+    });
+  }
+
+  function drawConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confetti.forEach(c => {
+      ctx.beginPath();
+      ctx.lineWidth = c.r;
+      ctx.strokeStyle = c.color;
+      ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
+      ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
+      ctx.stroke();
+    });
+    updateConfetti();
+  }
+
+  function updateConfetti() {
+    confetti.forEach(c => {
+      c.tiltAngle += c.tiltAngleIncrement;
+      c.y += (Math.cos(c.d) + 3 + c.r / 2) / 2;
+      c.tilt = Math.sin(c.tiltAngle) * 15;
+
+      if (c.y > canvas.height) {
+        c.y = -10;
+        c.x = Math.random() * canvas.width;
+      }
+    });
+  }
+
+  let animation;
+  function animate() {
+    animation = requestAnimationFrame(animate);
+    drawConfetti();
+  }
+  animate();
+
+  // Stop after 5 seconds
+  setTimeout(() => {
+    cancelAnimationFrame(animation);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }, 5000);
+}
+</script>
+
 
 
 
@@ -698,7 +789,7 @@
 <footer class="site-footer">
   <div class="footer-content container">
     <div class="footer-brand">
-      <img src="logo.png" alt="BitFidelity Logo" class="footer-logo">
+      <img src="logo.png" alt="AurumCaptial Logo" class="footer-logo">
       <p class="footer-tagline">AI-powered crypto investing platform for a smarter future.</p>
     </div>
 
@@ -735,7 +826,7 @@
   </div>
 
   <div class="footer-bottom">
-    <p>&copy; 2025 AurumCapital. All rights reserved.</p>
+    <p>&copy; 2025 AurumCaptial. All rights reserved.</p>
     <div class="legal-links">
       <a href="#">Privacy Policy</a>
       <a href="#">Terms of Use</a>

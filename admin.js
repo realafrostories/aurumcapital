@@ -16,12 +16,13 @@ import {
 
 // 🔧 Your Firebase Config
 const firebaseConfig = {
-  apiKey: "AIzaSyCF4I3704KZW6jmvasHGmdsK468ssAuebA",
-  authDomain: "altumfi-f39f1.firebaseapp.com",
-  projectId: "altumfi-f39f1",
-  storageBucket: "altumfi-f39f1.appspot.com",
-  messagingSenderId: "838201454123",
-  appId: "1:838201454123:web:c738f1938438c7dd9b446e"
+  apiKey: "AIzaSyCm7rYZgvhCjYoAr4_KzQcQovH1kClLtdI",
+  authDomain: "aurumcaptial.firebaseapp.com",
+  projectId: "aurumcaptial",
+  storageBucket: "aurumcaptial.firebasestorage.app",
+  messagingSenderId: "929610002491",
+  appId: "1:929610002491:web:ec818b7da5460c828d2c1e",
+  measurementId: "G-Z14JZMBJT1"
 };
 
 // ✅ Initialize
@@ -496,7 +497,7 @@ function attachAdminActions(container) {
         }
 
         // 3. Update wallet and mark record as approved
-        await updateDoc(walletRef, { usd: newBalance });
+        await setDoc(walletRef, { usd: newBalance }, { merge: true });
         await updateDoc(recordRef, { status: "true" });
 
         alert("✅ Approved and wallet updated");
@@ -525,27 +526,38 @@ function attachAdminActions(container) {
 }
 
 
-
 // ✅ Auto Refresh After Status Change
 document.querySelectorAll(".sub-section").forEach(section => {
   section.addEventListener("refresh", () => {
     const tabBtn = section.id.replace("Section", "Tab");
-    document.getElementById(tabBtn).click(); // simulate refresh
+    const tabEl = document.getElementById(tabBtn);
+    if (tabEl) tabEl.click(); // simulate refresh only if element exists
   });
 });
 
-// ✅ Load Default Tab
-document.getElementById("depositTabPending").click();
-document.getElementById("tabUsers").addEventListener("click", () => {
-  switchMainTab("users");
-  loadUsers(); // 🔥 Load users when tab opens
-});
+// ✅ Load Default Tab (safe check)
+const depPending = document.getElementById("depositTabPending");
+if (depPending) depPending.click();
+
+// ✅ Users tab
+const tabUsers = document.getElementById("tabUsers");
+if (tabUsers) {
+  tabUsers.addEventListener("click", () => {
+    switchMainTab("users");
+    loadUsers(); // 🔥 Load users when tab opens
+  });
+}
+
+// ✅ Expose global functions
 window.addFunds = addFunds;
 
-document.getElementById("closeChat").addEventListener("click", () => {
-  if (unsubscribeChatListener) unsubscribeChatListener();
-  document.getElementById("chatPopup").classList.add("hidden");
-});
-
-
+// ✅ Close chat safely
+const closeChatBtn = document.getElementById("closeChat");
+if (closeChatBtn) {
+  closeChatBtn.addEventListener("click", () => {
+    if (unsubscribeChatListener) unsubscribeChatListener();
+    const popup = document.getElementById("chatPopup");
+    if (popup) popup.classList.add("hidden");
+  });
+}
 

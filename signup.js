@@ -1,16 +1,19 @@
 // Firebase Imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { 
+  getFirestore, doc, setDoc, getDoc, updateDoc, increment 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // Firebase Config
 const firebaseConfig = {
-  apiKey: "AIzaSyCF4I3704KZW6jmvasHGmdsK468ssAuebA",
-    authDomain: "altumfi-f39f1.firebaseapp.com",
-    projectId: "altumfi-f39f1",
-    storageBucket: "altumfi-f39f1.firebasestorage.app",
-    messagingSenderId: "838201454123",
-    appId: "1:838201454123:web:c738f1938438c7dd9b446e"
+  apiKey: "AIzaSyCm7rYZgvhCjYoAr4_KzQcQovH1kClLtdI",
+  authDomain: "aurumcaptial.firebaseapp.com",
+  projectId: "aurumcaptial",
+  storageBucket: "aurumcaptial.firebasestorage.app",
+  messagingSenderId: "929610002491",
+  appId: "1:929610002491:web:ec818b7da5460c828d2c1e",
+  measurementId: "G-Z14JZMBJT1"
 };
 
 // Initialize Firebase
@@ -87,13 +90,20 @@ window.prevStep = () => {
   }
 };
 
-// Form Submit
+// ✅ Get Referral Code from URL
+function getReferralCode() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get("ref") || null;
+}
+
+// 🟡 Form Submit
 document.getElementById("signupForm").addEventListener("submit", async e => {
   e.preventDefault();
 
   const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
+  const referrerId = getReferralCode();
 
   window.showLoading();
 
@@ -101,17 +111,42 @@ document.getElementById("signupForm").addEventListener("submit", async e => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
+    // Create new user document
     await setDoc(doc(db, "Users", user.uid), {
       uid: user.uid,
       name: name,
       email: email,
+      referredBy: referrerId || null,
+      walletBalance: 0,
       createdAt: new Date().toISOString()
     });
 
+    // 🟢 If referral code exists, credit referrer $50
+    if (referrerId) {
+      const referrerRef = doc(db, "Users", referrerId);
+      const referrerSnap = await getDoc(referrerRef);
+
+      if (referrerSnap.exists()) {
+        await updateDoc(referrerRef, {
+          walletBalance: increment(50)
+        });
+
+        // Optional: store a "referralTransactions" log
+        const bonusRef = doc(db, "ReferralRewards", `${referrerId}_${user.uid}`);
+        await setDoc(bonusRef, {
+          referrer: referrerId,
+          referredUser: user.uid,
+          amount: 50,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+
     window.hideLoading();
 
+    // 🎉 Successful Signup
     window.showPopup("🎉 Account Created!", "Your AurumCapital account has been created.", () => {
-      window.location.href = "dashboard.html";
+      window.location.href = "dashboard.html?welcome=true";
     });
 
   } catch (err) {
@@ -119,7 +154,6 @@ document.getElementById("signupForm").addEventListener("submit", async e => {
     window.showPopup("❌ Signup Failed", err.message || "An error occurred while creating your account.");
   }
 });
-
 
 // Loading & Popup Functions (Global)
 window.showLoading = function () {

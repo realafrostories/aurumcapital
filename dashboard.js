@@ -3,12 +3,13 @@ import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/fi
 import { getFirestore, onSnapshot, Timestamp, doc, getDoc, collection, writeBatch, query, orderBy, where, getDocs, updateDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCF4I3704KZW6jmvasHGmdsK468ssAuebA",
-    authDomain: "altumfi-f39f1.firebaseapp.com",
-    projectId: "altumfi-f39f1",
-    storageBucket: "altumfi-f39f1.firebasestorage.app",
-    messagingSenderId: "838201454123",
-    appId: "1:838201454123:web:c738f1938438c7dd9b446e"
+  apiKey: "AIzaSyCm7rYZgvhCjYoAr4_KzQcQovH1kClLtdI",
+  authDomain: "aurumcaptial.firebaseapp.com",
+  projectId: "aurumcaptial",
+  storageBucket: "aurumcaptial.firebasestorage.app",
+  messagingSenderId: "929610002491",
+  appId: "1:929610002491:web:ec818b7da5460c828d2c1e",
+  measurementId: "G-Z14JZMBJT1"
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -31,6 +32,86 @@ function loopScroll() {
 }
 loopScroll();
 
+
+// Elements
+const referralLinkBox = document.getElementById("referralLink");
+const copyReferralBtn = document.getElementById("copyReferralBtn");
+const referralCount = document.getElementById("referralCount");
+const walletBalance = document.getElementById("walletBalance");
+
+// Helper: Show popups
+function showPopup(title, message) {
+  const titleEl = document.getElementById("popupTitle");
+  const textEl = document.getElementById("popupText");
+  const popup = document.getElementById("popupMessage");
+
+  if (titleEl && textEl && popup) {
+    titleEl.textContent = title;
+    textEl.textContent = message;
+    popup.classList.remove("hidden");
+  }
+}
+window.closePopup = function() {
+  const popup = document.getElementById("popupMessage");
+  if (popup) popup.classList.add("hidden");
+};
+
+// Handle copy button
+if (copyReferralBtn) {
+  copyReferralBtn.addEventListener("click", () => {
+    if (referralLinkBox && referralLinkBox.value) {
+      navigator.clipboard.writeText(referralLinkBox.value);
+      copyReferralBtn.textContent = "✅ Copied!";
+      setTimeout(() => (copyReferralBtn.textContent = "Copy"), 2000);
+    }
+  });
+}
+
+// Main Auth Listener
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "signup.html";
+    return;
+  }
+
+  const userRef = doc(db, "Users", user.uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) return;
+
+  const userData = userSnap.data();
+  const userId = user.uid;
+
+  // Display wallet balance
+  if (walletBalance) walletBalance.textContent = `$${userData.walletBalance || 0}`;
+
+  // Generate referral link
+  const refLink = `https://aurumcaptial.com/signup.html?ref=${userId}`;
+  if (referralLinkBox) referralLinkBox.value = refLink;
+
+  // Count successful referrals
+  const q = query(collection(db, "Users"), where("referredBy", "==", userId));
+  const refSnapshots = await getDocs(q);
+  const referralNum = refSnapshots.size;
+  if (referralCount) referralCount.textContent = referralNum;
+
+  // Watch for new rewards (live updates)
+  const rewardsQuery = query(collection(db, "ReferralRewards"), where("referrer", "==", userId));
+  onSnapshot(rewardsQuery, (snapshot) => {
+    let total = 0;
+    snapshot.forEach((doc) => (total += doc.data().amount || 0));
+    if (total > (userData.walletBalance || 0)) {
+      showPopup("🎉 Congratulations!", "A new referral bonus of $50 has been added to your wallet!");
+launchConfetti();
+const card = document.querySelector(".referral-card");
+if (card) {
+  card.classList.add("glow");
+  setTimeout(() => card.classList.remove("glow"), 5000);
+}
+
+    }
+  });
+});
 
 
 
@@ -302,20 +383,20 @@ function formatWithCommas(num) {
 function getPlanName(amount) {
   if (amount >= 1_000_000) return "👑 Billionaire Plan";
   if (amount >= 100_000) return "🥇 Gold Plan";
-  if (amount >= 50_000) return "💎 Deluxe Plan";
-  if (amount >= 20_000) return "🏢 Business Plan";
-  if (amount >= 2_000) return "🚀 Pro Plan";
-  if (amount >= 100) return "🎯 Starter Plan";
+  if (amount >= 40_000) return "💎 VIP Plan";
+  if (amount >= 10_000) return "🏢 Adrit Plan";
+  if (amount >= 2_000) return "🚀 Premium Plan";
+  if (amount >= 100) return "🎯 Bronze Plan";
   return null;
 }
 function getPlanPercent(planName) {
   switch (planName) {
-    case "Starter Plan": return 23;
-    case "Pro Plan": return 41;
-    case "Business Plan": return 53;
-    case "Deluxe Plan": return 60;
-    case "Gold Plan": return 78;
-    case "Billionaire Plan": return 96;
+    case "Bronze Plan": return 10;
+    case "Premium Plan": return 60;
+    case "Adrit Plan": return 160;
+    case "VIP Plan": return 300;
+    case "Gold Plan": return 500;
+    case "Billionaire Plan": return 1200;
     default: return 10;
   }
 }
@@ -2425,7 +2506,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-
+    
 auth.onAuthStateChanged(async (user) => {
 
   const newInvestmentBtn = document.getElementById("newInvestmentBtn");
@@ -2441,6 +2522,8 @@ async function checkInvestmentExistence(userId) {
   if (user) {
     await checkInvestmentExistence(user.uid);
     // ... continue with your other logic
+
+    
   }
 
   function isElementInFullView(el) {
@@ -2480,6 +2563,8 @@ window.addEventListener("scroll", updateInvestmentButtonVisibility);
 window.addEventListener("resize", updateInvestmentButtonVisibility);
 });
 
+
+
 const navToggle = document.getElementById('navToggle');
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('sidebarOverlay');
@@ -2500,3 +2585,5 @@ overlay.addEventListener('click', () => {
     overlay.classList.add('hidden');
   }, 300);
 });
+
+

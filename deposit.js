@@ -23,12 +23,13 @@ import {
 
 // Firebase config
 const firebaseConfig = {
-  apiKey: "AIzaSyCF4I3704KZW6jmvasHGmdsK468ssAuebA",
-    authDomain: "altumfi-f39f1.firebaseapp.com",
-    projectId: "altumfi-f39f1",
-    storageBucket: "altumfi-f39f1.firebasestorage.app",
-    messagingSenderId: "838201454123",
-    appId: "1:838201454123:web:c738f1938438c7dd9b446e"
+  apiKey: "AIzaSyCm7rYZgvhCjYoAr4_KzQcQovH1kClLtdI",
+  authDomain: "aurumcaptial.firebaseapp.com",
+  projectId: "aurumcaptial",
+  storageBucket: "aurumcaptial.firebasestorage.app",
+  messagingSenderId: "929610002491",
+  appId: "1:929610002491:web:ec818b7da5460c828d2c1e",
+  measurementId: "G-Z14JZMBJT1"
 };
 
 const app = initializeApp(firebaseConfig);
