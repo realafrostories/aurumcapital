@@ -217,63 +217,69 @@ async function saveStepData(index) {
         }
       };
     });
-  } else {
+ } else {
   const resendBtn = document.createElement("button");
   resendBtn.textContent = "Resend Verification Email";
   resendBtn.className = "resend-btn";
-  resendBtn.disabled = true;
 
-  let countdown = 60; // 1 minute cooldown
-  resendBtn.textContent = `Resend in ${countdown}s`;
-
-  // Append the button to the wait screen (only once)
   const waitActions = document.getElementById("waitActions") || document.createElement("div");
   waitActions.id = "waitActions";
   waitActions.style.marginTop = "20px";
   if (!document.getElementById("waitActions")) {
     waitScreen.appendChild(waitActions);
   }
-  waitActions.innerHTML = ""; // clear old content
+  waitActions.innerHTML = "";
   waitActions.appendChild(resendBtn);
 
-  // Send initial email
-  await sendEmailVerification(currentUser);
+  // Show the wait screen
   await updateDoc(docRef, { verified: "wait" });
   showWaitScreen();
   pollVerification();
 
-  // Countdown timer
-  const timer = setInterval(() => {
-    countdown--;
-    resendBtn.textContent = `Resend in ${countdown}s`;
-    if (countdown <= 0) {
-      clearInterval(timer);
-      resendBtn.textContent = "Resend Verification Email";
-      resendBtn.disabled = false;
-    }
-  }, 1000);
+  const TIMER_KEY = "resendCountdownExpire";
+  const now = Date.now();
+  let expireTime = localStorage.getItem(TIMER_KEY);
 
-  // Resend button click handler
+  // If expired or missing, send first email and start fresh
+  if (!expireTime || now > Number(expireTime)) {
+    await sendEmailVerification(currentUser);
+    expireTime = now + 60 * 1000; // 1 minute ahead
+    localStorage.setItem(TIMER_KEY, expireTime);
+  }
+
+  const updateButton = () => {
+    const remaining = Math.floor((Number(expireTime) - Date.now()) / 1000);
+    if (remaining > 0) {
+      resendBtn.disabled = true;
+      resendBtn.textContent = `Resend in ${remaining}s`;
+    } else {
+      resendBtn.disabled = false;
+      resendBtn.textContent = "Resend Verification Email";
+      clearInterval(timer);
+      localStorage.removeItem(TIMER_KEY);
+    }
+  };
+
+  updateButton();
+  const timer = setInterval(updateButton, 1000);
+
+  // Handle resend click
   resendBtn.addEventListener("click", async () => {
     resendBtn.disabled = true;
-    countdown = 60;
-    resendBtn.textContent = `Resend in ${countdown}s`;
-
+    resendBtn.textContent = "Sending...";
     await sendEmailVerification(currentUser);
 
-    const newTimer = setInterval(() => {
-      countdown--;
-      resendBtn.textContent = `Resend in ${countdown}s`;
-      if (countdown <= 0) {
-        clearInterval(newTimer);
-        resendBtn.textContent = "Resend Verification Email";
-        resendBtn.disabled = false;
-      }
-    }, 1000);
+    const newExpire = Date.now() + 60 * 1000;
+    localStorage.setItem(TIMER_KEY, newExpire);
+    expireTime = newExpire;
+    updateButton();
+
+    const newTimer = setInterval(updateButton, 1000);
   });
 
   return false;
 }
+
 
 }
 
