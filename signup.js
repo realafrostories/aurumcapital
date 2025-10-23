@@ -117,7 +117,7 @@ document.getElementById("signupForm").addEventListener("submit", async e => {
       name: name,
       email: email,
       referredBy: referrerId || null,
-      walletBalance: 0,
+      totalBonus: 0,
       createdAt: new Date().toISOString()
     });
 
@@ -128,7 +128,7 @@ document.getElementById("signupForm").addEventListener("submit", async e => {
 
       if (referrerSnap.exists()) {
         await updateDoc(referrerRef, {
-          walletBalance: increment(50)
+          totalBonus: increment(50)
         });
 
         // Optional: store a "referralTransactions" log
@@ -145,7 +145,7 @@ document.getElementById("signupForm").addEventListener("submit", async e => {
     window.hideLoading();
 
     // 🎉 Successful Signup
-    window.showPopup("🎉 Account Created!", "Your AurumCapital account has been created.", () => {
+    window.showPopup("🎉 Account Created!", "Your AurumCaptial account has been created.", () => {
       window.location.href = "dashboard.html?welcome=true";
     });
 

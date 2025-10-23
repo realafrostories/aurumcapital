@@ -106,7 +106,10 @@ function showWaitScreen() {
   waitScreen.classList.remove("hidden");
   waitScreen.style.display = "flex";
   progressBar.style.width = "100%";
+
+  setupResendButton();
 }
+
 
 // Poll for verification
 function pollVerification() {
@@ -217,6 +220,9 @@ async function saveStepData(index) {
         }
       };
     });
+
+
+
  } else {
   const resendBtn = document.createElement("button");
   resendBtn.textContent = "Resend Verification Email";
@@ -279,8 +285,6 @@ async function saveStepData(index) {
 
   return false;
 }
-
-
 }
 
 
@@ -326,16 +330,23 @@ onAuthStateChanged(auth, async (user) => {
   document.getElementById("currentEmail").textContent = currentUser.email;
 
   if (verified === "true") {
-    formArea.style.display = "none";
-    alreadyVerifiedDiv.classList.remove("hidden");
-  } else if (verified === "wait" && stage >= 4) {
-    showWaitScreen();
-  } else {
-    currentStage = Math.max(0, Math.min(stage, stepScreens.length - 1));
-    formArea.classList.remove("hidden");
-    formArea.style.display = "block";
-    showStep(currentStage);
-  }
+  formArea.style.display = "none";
+  alreadyVerifiedDiv.classList.remove("hidden");
+} else if (verified === "wait" && stage >= 4) {
+  showWaitScreen();
+
+  // 🧠 If the countdown is active in localStorage, restore it immediately
+  setupResendButton();
+
+  // Continue polling for verification as before
+  pollVerification();
+} else {
+  currentStage = Math.max(0, Math.min(stage, stepScreens.length - 1));
+  formArea.classList.remove("hidden");
+  formArea.style.display = "block";
+  showStep(currentStage);
+}
+
 });
 
 // Navigation Buttons
@@ -357,3 +368,119 @@ prevBtns.forEach((btn) => {
     }
   });
 });
+
+
+
+
+function setupResendButton() {
+  const TIMER_KEY = "resendCountdownExpire";
+  const waitActions = document.getElementById("waitActions");
+  if (!waitActions) return; // defensive: container must exist in HTML
+
+  // If button already exists, do not recreate event handlers repeatedly.
+  let resendBtn = document.getElementById("resendVerifyBtn");
+  let countdownSpan = document.getElementById("resendCountdownSpan");
+
+  if (!resendBtn) {
+    resendBtn = document.createElement("button");
+    resendBtn.id = "resendVerifyBtn";
+    resendBtn.className = "resend-btn";
+    resendBtn.textContent = "Resend Verification Email";
+    resendBtn.style.padding = "8px 12px";
+    resendBtn.style.borderRadius = "8px";
+    resendBtn.style.border = "none";
+    resendBtn.style.cursor = "pointer";
+    resendBtn.style.fontWeight = "600";
+    waitActions.appendChild(resendBtn);
+  }
+
+  if (!countdownSpan) {
+    countdownSpan = document.createElement("span");
+    countdownSpan.id = "resendCountdownSpan";
+    countdownSpan.style.fontSize = "0.95rem";
+    countdownSpan.style.color = "#666";
+    waitActions.appendChild(countdownSpan);
+  }
+
+  // Clear any previously attached handler to avoid duplicates
+  resendBtn.onclick = null;
+
+  // Timer handling
+  let timerId = Number(resendBtn.dataset._timerId) || null;
+  if (timerId) {
+    clearInterval(timerId);
+    resendBtn.dataset._timerId = "";
+  }
+
+  // Read expire time from localStorage
+  let expire = Number(localStorage.getItem(TIMER_KEY)) || 0;
+
+  const updateUI = () => {
+    const now = Date.now();
+    const remaining = Math.max(0, Math.floor((expire - now) / 1000));
+    if (remaining > 0) {
+      resendBtn.disabled = true;
+      resendBtn.style.opacity = "0.6";
+      resendBtn.textContent = `Resend in ${remaining}s`;
+      countdownSpan.textContent = "(please check your inbox / spam)";
+    } else {
+      resendBtn.disabled = false;
+      resendBtn.style.opacity = "1";
+      resendBtn.textContent = "Resend Verification Email";
+      countdownSpan.textContent = "";
+      // clear stored expire if present
+      if (localStorage.getItem(TIMER_KEY)) localStorage.removeItem(TIMER_KEY);
+      if (resendBtn.dataset._timerId) {
+        clearInterval(Number(resendBtn.dataset._timerId));
+        resendBtn.dataset._timerId = "";
+      }
+    }
+  };
+
+  // start interval if expire is in the future
+  if (expire && expire > Date.now()) {
+    updateUI();
+    const id = setInterval(updateUI, 1000);
+    resendBtn.dataset._timerId = String(id);
+  } else {
+    // no active countdown
+    updateUI();
+  }
+
+  // Attach click handler (single handler)
+  resendBtn.addEventListener("click", async () => {
+    // disable immediately & send email
+    resendBtn.disabled = true;
+    resendBtn.style.opacity = "0.6";
+    resendBtn.textContent = "Sending...";
+    countdownSpan.textContent = "";
+
+    try {
+      await sendEmailVerification(currentUser);
+
+      // store expire and start countdown
+      expire = Date.now() + 60 * 1000;
+      localStorage.setItem(TIMER_KEY, String(expire));
+
+      // ensure any previous timer cleared
+      if (resendBtn.dataset._timerId) {
+        clearInterval(Number(resendBtn.dataset._timerId));
+        resendBtn.dataset._timerId = "";
+      }
+
+      // start interval
+      updateUI();
+      const id = setInterval(updateUI, 1000);
+      resendBtn.dataset._timerId = String(id);
+    } catch (err) {
+      console.error("Failed to resend verification email:", err);
+      // show basic feedback
+      resendBtn.textContent = "Send failed — try again";
+      setTimeout(() => {
+        resendBtn.textContent = "Resend Verification Email";
+        resendBtn.disabled = false;
+        resendBtn.style.opacity = "1";
+      }, 2500);
+    }
+  }, { once: false });
+}

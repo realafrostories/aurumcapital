@@ -83,7 +83,7 @@ onAuthStateChanged(auth, async (user) => {
   const userId = user.uid;
 
   // Display wallet balance
-  if (walletBalance) walletBalance.textContent = `$${userData.walletBalance || 0}`;
+  if (walletBalance) walletBalance.textContent = `$${userData.totalBonus || 0}`;
 
   // Generate referral link
   const refLink = `https://aurumcaptial.com/signup.html?ref=${userId}`;
@@ -100,7 +100,7 @@ onAuthStateChanged(auth, async (user) => {
   onSnapshot(rewardsQuery, (snapshot) => {
     let total = 0;
     snapshot.forEach((doc) => (total += doc.data().amount || 0));
-    if (total > (userData.walletBalance || 0)) {
+    if (total > (userData.totalBonus || 0)) {
       showPopup("🎉 Congratulations!", "A new referral bonus of $50 has been added to your wallet!");
 launchConfetti();
 const card = document.querySelector(".referral-card");
