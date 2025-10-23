@@ -98,7 +98,7 @@ select {
 }
 
 #confirmDepositBtn {
-  background: red;
+  background: #007bff;
   color: #fff;
   padding: 12px 25px;
   border: none;
@@ -512,4 +512,38 @@ body.modal-open {
   box-shadow: 0 4px 12px rgba(185, 28, 28, 0.4);
   animation: pulseBtn 1.5s infinite ease-in-out;
   transition: transform 0.2s ease;
+}
+
+
+
+.crypto-address-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+  background: transparent;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.copy-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.copy-btn:hover {
+  background: #0056b3;
+  transform: scale(1.05);
+}
+
+.copy-btn:active {
+  transform: scale(0.95);
 }

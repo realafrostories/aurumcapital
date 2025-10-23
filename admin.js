@@ -197,14 +197,24 @@ async function loadRecords(type, statusFilter, container) {
     const snap = await getDocs(collectionGroup(db, "records"));
     let count = 0;
     let found = false;
-
     container.innerHTML = "";
 
-    snap.forEach(docSnap => {
-      const path = docSnap.ref.path; // ✅ Only inside forEach
-      const [parentCollection, userId, sub, recordId] = path.split("/");
+    // We'll collect promises so we can await user + wallet fetches in parallel per doc
+    const renderPromises = [];
 
-      const isCorrectType = parentCollection === type; // "Deposits" or "Withdrawals"
+    snap.forEach(docSnap => {
+      const path = docSnap.ref.path; // e.g. "Deposits/{userId}/records/{recordId}"
+      const parts = path.split("/");
+
+      // defensive: expect at least 4 parts
+      if (parts.length < 4) return;
+
+      const parentCollection = parts[0];              // "Deposits" or "Withdrawals"
+      const userId = parts[1];                        // user id
+      const sub = parts[2];                           // "records"
+      const recordId = parts[3];                      // record id
+
+      const isCorrectType = parentCollection === type;
       const data = docSnap.data();
       const status = data.status?.toString();
       const isPending = !["true", "false"].includes(status);
@@ -214,32 +224,109 @@ async function loadRecords(type, statusFilter, container) {
         (statusFilter === status)
       );
 
-      if (isCorrectType && shouldShow) {
-        found = true;
-        count++;
+      if (!isCorrectType || !shouldShow) return;
 
-        container.appendChild(renderCard(userId, docSnap.id, data, type));
-      }
+      found = true;
+      count++;
+
+      // Fetch user name and wallet in parallel
+      renderPromises.push((async () => {
+        // Fetch user doc
+        let displayName = userId;
+        try {
+          const userRef = doc(db, "Users", userId);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            const ud = userSnap.data();
+            displayName = ud.username || ud.name || ud.email || userId;
+          }
+        } catch (e) {
+          console.warn("Could not fetch user for", userId, e);
+        }
+
+        // Fetch wallet
+        let walletValue = "N/A";
+        try {
+          const walletRef = doc(db, "Wallet", userId);
+          const walletSnap = await getDoc(walletRef);
+          if (walletSnap.exists()) {
+            const w = walletSnap.data();
+            walletValue = typeof w.usd !== "undefined" ? Number(w.usd) : "N/A";
+          }
+        } catch (e) {
+          console.warn("Could not fetch wallet for", userId, e);
+        }
+
+        // Normalize date formatting
+        let dateStr = "Unknown";
+        const createdAt = data.createdAt ?? data.timestamp ?? null;
+        if (createdAt) {
+          try {
+            let dateObj;
+            if (typeof createdAt === "string") {
+              dateObj = new Date(createdAt);
+            } else if (typeof createdAt.toDate === "function") {
+              // Firestore Timestamp
+              dateObj = createdAt.toDate();
+            } else {
+              dateObj = new Date(createdAt);
+            }
+            if (!isNaN(dateObj)) {
+              dateStr = dateObj.toLocaleString();
+            }
+          } catch (e) {
+            console.warn("Date parse error:", e);
+          }
+        }
+
+        // Grab gift card type/proof fields if present
+        const cardType = data.cardType || data.type || "N/A";
+        const proof = data.proof || data.code || data.proofCode || "N/A";
+        const proofType = data.proofType || "N/A";
+        const amount = typeof data.amount !== "undefined" ? data.amount : (data.cardValue || "N/A");
+        const method = data.method || "N/A";
+        const statusText = data.status || (isPending ? "pending" : "N/A");
+
+        // Append rendered card to container
+        const cardEl = renderCard({
+          userId,
+          displayName,
+          recordId,
+          amount,
+          walletValue,
+          method,
+          dateStr,
+          status: statusText,
+          cardType,
+          proof,
+          proofType,
+          rawData: data,
+          type // Deposits / Withdrawals
+        });
+
+        container.appendChild(cardEl);
+      })());
     });
+
+    await Promise.all(renderPromises);
 
     if (!found) {
       container.innerHTML = `<p class="text-gray-500 text-sm">No ${statusFilter} ${type.toLowerCase()} found.</p>`;
     }
 
-    // ✅ Update the tab count
-   const base = type === "Deposits" ? "deposit" : "withdraw";
-const countId = `${base}Count${capitalize(statusFilter)}`;
-console.log("🔍 Count ID:", countId);
+    // Update the tab count
+    const base = type === "Deposits" ? "deposit" : "withdraw";
+    const countId = `${base}Count${capitalize(statusFilter)}`;
+    console.log("🔍 Count ID:", countId);
 
-const badge = document.getElementById(countId);
-console.log("📛 Badge found:", badge);
+    const badge = document.getElementById(countId);
+    console.log("📛 Badge found:", badge);
 
-if (badge) {
-  badge.textContent = count;
-} else {
-  console.warn(`⚠️ Could not find span with id="${countId}" in your HTML`);
-}
-
+    if (badge) {
+      badge.textContent = count;
+    } else {
+      console.warn(`⚠️ Could not find span with id="${countId}" in your HTML`);
+    }
 
   } catch (err) {
     console.error(`❌ Error loading ${type}:`, err);
@@ -428,35 +515,97 @@ try {
 
 
 // ✅ Card Renderer
-function renderCard(userId, recordId, data, type) {
+function renderCard(info) {
+  const {
+    userId, displayName, recordId, amount, walletValue,
+    method, dateStr, status, cardType, proof, proofType, rawData, type
+  } = info;
+
   const wrapper = document.createElement("div");
-  wrapper.className = "p-4 bg-white border rounded shadow space-y-1";
+  wrapper.className = "p-4 bg-white border rounded shadow space-y-1 sub-record-card";
 
-  const isPending = !["true", "false"].includes(data.status?.toString());
+  const isPending = !["true", "false"].includes((rawData.status || "").toString());
 
-  wrapper.innerHTML = `
-    <p class="text-sm"><strong>User:</strong> ${userId}</p>
-    <p><strong>Amount:</strong> $${data.amount}</p>
-    <p><strong>Wallet:</strong> ${data.wallet || 'N/A'}</p>
-    <p><strong>Method:</strong> ${data.method || 'Crypto'}</p>
-    <p><strong>Date:</strong> ${data.timestamp?.toDate().toLocaleString() || 'Unknown'}</p>
-    <p><strong>Status:</strong> ${data.status || 'pending'}</p>
-    ${isPending ? `
-      <div class="flex gap-2 mt-2">
-        <button class="approveBtn bg-green-500 text-white px-2 py-1 rounded text-sm" data-user="${userId}" data-id="${recordId}" data-type="${type}">✅ Approve</button>
-        <button class="declineBtn bg-red-500 text-white px-2 py-1 rounded text-sm" data-user="${userId}" data-id="${recordId}" data-type="${type}">❌ Decline</button>
-      </div>` : ""
-    }
+  // 🧠 Format date nicely if valid
+  const formattedDate = dateStr
+    ? new Date(dateStr).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })
+    : "Unknown";
+
+  // 🧩 Base HTML
+  let html = `
+    <p class="text-sm">
+      <strong>User:</strong> ${escapeHtml(displayName)} 
+      <span class="text-xs text-slate-400">(${escapeHtml(userId)})</span>
+    </p>
+    <p><strong>Amount:</strong> $${escapeHtml(amount)}</p>
+    <p><strong>Wallet:</strong> ${walletValue === "N/A" ? "N/A" : `$${escapeHtml(walletValue)}`}</p>
+    <p><strong>Method:</strong> ${escapeHtml(method)}</p>
   `;
 
-  // Add listeners after render
-  setTimeout(() => attachAdminActions(wrapper), 0);
+  // 🎁 Only add GiftCard fields when method is GiftCard
+  if (method === "GiftCard") {
+    html += `
+      <p><strong>Gift Type:</strong> ${escapeHtml(cardType || "N/A")}</p>
+      <p><strong>Proof (${escapeHtml(proofType || "code")}):</strong> <code>${escapeHtml(proof || "N/A")}</code></p>
+    `;
+  }
+
+  // 📅 Add date + status
+  html += `
+    <p><strong>Date:</strong> ${escapeHtml(formattedDate)}</p>
+    <p><strong>Status:</strong> ${escapeHtml(status)}</p>
+  `;
+
+  // 🧾 Add action buttons if pending
+  if (isPending) {
+    html += `
+      <div class="flex gap-2 mt-2">
+        <button 
+          class="approveBtn bg-green-500 text-white px-2 py-1 rounded text-sm hover:bg-green-600 transition"
+          data-user="${userId}" 
+          data-id="${recordId}" 
+          data-type="${type}"
+        >✅ Approve</button>
+        <button 
+          class="declineBtn bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600 transition"
+          data-user="${userId}" 
+          data-id="${recordId}" 
+          data-type="${type}"
+        >❌ Decline</button>
+      </div>
+    `;
+  }
+
+  wrapper.innerHTML = html;
+
+  // Attach buttons listeners for this card
+  attachAdminActions(wrapper);
+
   return wrapper;
 }
 
+
+/** small HTML-escape helper to avoid accidental injection when displaying DB strings */
+function escapeHtml(str) {
+  if (str === null || typeof str === "undefined") return "";
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+
+
 // ✅ Button Actions
 function attachAdminActions(container) {
+  // Approve buttons
   container.querySelectorAll(".approveBtn").forEach(btn => {
+    // Avoid attaching duplicate listeners
+    if (btn._attached) return;
+    btn._attached = true;
+
     btn.addEventListener("click", async () => {
       const { user, id, type } = btn.dataset;
       const recordRef = doc(db, type, user, "records", id);
@@ -471,7 +620,7 @@ function attachAdminActions(container) {
         }
 
         const record = recordSnap.data();
-        const amount = Number(record.amount);
+        const amount = Number(record.amount || record.cardValue || 0);
         if (isNaN(amount)) {
           alert("❌ Invalid amount");
           return;
@@ -480,11 +629,10 @@ function attachAdminActions(container) {
         // 2. Get current wallet balance
         const walletSnap = await getDoc(walletRef);
         const currentBalance = walletSnap.exists()
-          ? Number(walletSnap.data().usd || 0)
+          ? Number(walletSnap.data().usd || walletSnap.data().walletBalance || 0)
           : 0;
 
-        // ✅ If this is a deposit → add to balance
-        // ✅ If this is a withdrawal → subtract from balance
+        // update balance
         let newBalance = currentBalance;
         if (type === "Deposits") {
           newBalance = currentBalance + amount;
@@ -496,11 +644,12 @@ function attachAdminActions(container) {
           }
         }
 
-        // 3. Update wallet and mark record as approved
+        // Use setDoc with merge to create wallet if missing
         await setDoc(walletRef, { usd: newBalance }, { merge: true });
         await updateDoc(recordRef, { status: "true" });
 
         alert("✅ Approved and wallet updated");
+        // emit refresh event to parent sub-section
         btn.closest(".sub-section")?.dispatchEvent(new Event("refresh"));
       } catch (err) {
         console.error("❌ Approval error:", err);
@@ -509,7 +658,11 @@ function attachAdminActions(container) {
     });
   });
 
+  // Decline buttons
   container.querySelectorAll(".declineBtn").forEach(btn => {
+    if (btn._attached) return;
+    btn._attached = true;
+
     btn.addEventListener("click", async () => {
       const { user, id, type } = btn.dataset;
       const ref = doc(db, type, user, "records", id);

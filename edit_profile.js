@@ -218,12 +218,63 @@ async function saveStepData(index) {
       };
     });
   } else {
-    await sendEmailVerification(currentUser);
-    await updateDoc(docRef, { verified: "wait" });
-    showWaitScreen();
-    pollVerification();
-    return false;
+  const resendBtn = document.createElement("button");
+  resendBtn.textContent = "Resend Verification Email";
+  resendBtn.className = "resend-btn";
+  resendBtn.disabled = true;
+
+  let countdown = 60; // 1 minute cooldown
+  resendBtn.textContent = `Resend in ${countdown}s`;
+
+  // Append the button to the wait screen (only once)
+  const waitActions = document.getElementById("waitActions") || document.createElement("div");
+  waitActions.id = "waitActions";
+  waitActions.style.marginTop = "20px";
+  if (!document.getElementById("waitActions")) {
+    waitScreen.appendChild(waitActions);
   }
+  waitActions.innerHTML = ""; // clear old content
+  waitActions.appendChild(resendBtn);
+
+  // Send initial email
+  await sendEmailVerification(currentUser);
+  await updateDoc(docRef, { verified: "wait" });
+  showWaitScreen();
+  pollVerification();
+
+  // Countdown timer
+  const timer = setInterval(() => {
+    countdown--;
+    resendBtn.textContent = `Resend in ${countdown}s`;
+    if (countdown <= 0) {
+      clearInterval(timer);
+      resendBtn.textContent = "Resend Verification Email";
+      resendBtn.disabled = false;
+    }
+  }, 1000);
+
+  // Resend button click handler
+  resendBtn.addEventListener("click", async () => {
+    resendBtn.disabled = true;
+    countdown = 60;
+    resendBtn.textContent = `Resend in ${countdown}s`;
+
+    await sendEmailVerification(currentUser);
+
+    const newTimer = setInterval(() => {
+      countdown--;
+      resendBtn.textContent = `Resend in ${countdown}s`;
+      if (countdown <= 0) {
+        clearInterval(newTimer);
+        resendBtn.textContent = "Resend Verification Email";
+        resendBtn.disabled = false;
+      }
+    }, 1000);
+  });
+
+  return false;
+}
+
 }
 
 

@@ -302,3 +302,28 @@ window.addEventListener("DOMContentLoaded", () => {
 
   
 });
+
+
+
+// Copy crypto address functionality
+const copyBtn = document.getElementById('copyAddressBtn');
+const cryptoAddressEl = document.getElementById('cryptoAddress');
+
+if (copyBtn && cryptoAddressEl) {
+  copyBtn.addEventListener('click', async () => {
+    const address = cryptoAddressEl.textContent.trim();
+    if (!address) return;
+
+    try {
+      await navigator.clipboard.writeText(address);
+      copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+      copyBtn.style.background = '#28a745';
+      setTimeout(() => {
+        copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+        copyBtn.style.background = '#007bff';
+      }, 2000);
+    } catch (err) {
+      console.error('Copy failed:', err);
+    }
+  });
+}

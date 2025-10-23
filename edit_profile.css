@@ -413,3 +413,24 @@ input:focus, select:focus {
 body.modal-open {
   overflow: hidden;
 }
+
+
+
+.resend-btn {
+  background: linear-gradient(90deg, #f5b942, #e0a31e);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.resend-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+.resend-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 8px rgba(245, 185, 66, 0.5);
+}
