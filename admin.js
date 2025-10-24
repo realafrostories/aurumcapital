@@ -126,23 +126,27 @@ function switchMainTab(tab) {
 }
 
 async function addFunds(userId) {
-  const userSnap = await getDoc(doc(db, "Users", userId));
-  if (userSnap.exists() && userSnap.data().blocked === true) {
-    alert("❌ Cannot add funds — user is blocked.");
-    return;
-  }
-
-  const input = prompt(`Enter amount to add to ${userId}'s wallet:`);
-
-  if (!input) return;
-  const amount = parseFloat(input);
-
-  if (isNaN(amount) || amount <= 0) {
-    alert("❌ Invalid amount.");
-    return;
-  }
-
   try {
+    // Check if user is blocked
+    const userRef = doc(db, "Users", userId);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists() && userSnap.data().blocked === true) {
+      alert("❌ Cannot add funds — user is blocked.");
+      return;
+    }
+
+    // Prompt for amount
+    const input = prompt(`Enter amount to add to ${userId}'s wallet:`);
+    if (!input) return;
+
+    const amount = parseFloat(input);
+    if (isNaN(amount) || amount <= 0) {
+      alert("❌ Invalid amount.");
+      return;
+    }
+
+    // Get or create wallet document
     const walletRef = doc(db, "Wallet", userId);
     const walletSnap = await getDoc(walletRef);
 
@@ -150,14 +154,19 @@ async function addFunds(userId) {
     if (walletSnap.exists()) {
       const data = walletSnap.data();
       current = parseFloat(data.usd) || 0;
+    } else {
+      // Create wallet if it doesn't exist
+      await setDoc(walletRef, { usd: 0 });
+      console.log(`🆕 Wallet created for user: ${userId}`);
     }
 
     const newBalance = current + amount;
 
+    // Update wallet balance
     await updateDoc(walletRef, { usd: newBalance });
-    alert(`✅ $${amount} added. New balance: $${newBalance}`);
+    alert(`✅ $${amount} added successfully. New balance: $${newBalance}`);
 
-    // Optional: reload users if you're showing balances live
+    // Optional: reload UI
     if (typeof loadUsers === "function") loadUsers();
 
   } catch (err) {

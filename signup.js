@@ -96,6 +96,9 @@ function getReferralCode() {
   return urlParams.get("ref") || null;
 }
 
+
+
+
 // 🟡 Form Submit
 document.getElementById("signupForm").addEventListener("submit", async e => {
   e.preventDefault();
@@ -108,52 +111,60 @@ document.getElementById("signupForm").addEventListener("submit", async e => {
   window.showLoading();
 
   try {
+    // ✅ Create new user account
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Create new user document
+    // ✅ Create new user record
     await setDoc(doc(db, "Users", user.uid), {
       uid: user.uid,
       name: name,
       email: email,
       referredBy: referrerId || null,
       totalBonus: 0,
+      referrals: 0, // new users start with 0 referrals
       createdAt: new Date().toISOString()
     });
 
-    // 🟢 If referral code exists, credit referrer $50
+    // 🟢 If referral code exists, reward referrer
     if (referrerId) {
       const referrerRef = doc(db, "Users", referrerId);
       const referrerSnap = await getDoc(referrerRef);
 
       if (referrerSnap.exists()) {
+        // ✅ Update totalBonus (+$50) and referrals count (+1)
         await updateDoc(referrerRef, {
-          totalBonus: increment(50)
+          totalBonus: increment(50),
+          referrals: increment(1)
         });
 
-        // Optional: store a "referralTransactions" log
-        const bonusRef = doc(db, "ReferralRewards", `${referrerId}_${user.uid}`);
-        await setDoc(bonusRef, {
+        // ✅ Optional: log the referral transaction
+        const rewardRef = doc(db, "ReferralRewards", `${referrerId}_${user.uid}`);
+        await setDoc(rewardRef, {
           referrer: referrerId,
           referredUser: user.uid,
           amount: 50,
           timestamp: new Date().toISOString()
         });
+      } else {
+        console.warn("Referrer not found:", referrerId);
       }
     }
 
     window.hideLoading();
 
-    // 🎉 Successful Signup
+    // 🎉 Show success message
     window.showPopup("🎉 Account Created!", "Your AurumCaptial account has been created.", () => {
       window.location.href = "dashboard.html?welcome=true";
     });
 
   } catch (err) {
+    console.error("Signup error:", err);
     window.hideLoading();
     window.showPopup("❌ Signup Failed", err.message || "An error occurred while creating your account.");
   }
 });
+
 
 // Loading & Popup Functions (Global)
 window.showLoading = function () {
