@@ -6,6 +6,7 @@
   <title>AurumCaptial Dashboard</title>
   <link rel="stylesheet" href="dashboard.css" />
   <link rel="stylesheet" href="investments.css" />
+  <link rel="stylesheet" href="support.css" />
   <link rel="stylesheet" href="withdrawals.css" />
   <link rel="stylesheet" href="chatroom.css" />
   <link rel="icon" href="logo.png" type="image/png">
@@ -396,8 +397,7 @@
       <p class="min-note text-xs text-red-500 font-medium"></p>
       </div>
 
-      <p class="text-xs text-gray-500 italic" id="wtext"><b>Note: </b>We charge a 15% fee per withdraw, which includes tax & dynamic network fees. Withdrawals within the proper 5 business/working days takes up to 24hours to reflect, otherwise expect extra delay</p>
-
+      
       <div class="wallet-input-wrapper">
   <label for="withdrawWallet" class="wallet-label">BTC Wallet Address</label>
   <div class="wallet-input-container">
@@ -429,7 +429,7 @@
       <div class="icon">👥</div>
       <h3>Online Community</h3>
       <p>Join our open community room and connect with other users in real time.</p>
-      <button id="enterChatRoomBtn" class="chat-room-btn">💬 Enter Chat Room</button>
+      <button id="enterChatRoomBtn" class="crbtn">💬 Enter Chat Room</button>
     </div>
 
     <!-- Live Support Card -->
@@ -437,7 +437,7 @@
       <div class="icon">🎧</div>
       <h3>Live Support</h3>
       <p>Chat with our support team if you need help with your account or transactions.</p>
-      <button id="chatSupportBtn">Chat with Support</button>
+      <button id="chatSupportBtn" class="csbtn"> Chat with Support</button>
 
   </div>
 
@@ -445,7 +445,7 @@
       <div class="icon"><img src="https://cdn-icons-png.flaticon.com/512/4264/4264838.png" height="60px" width="60px"/></div>
       <h3>Try Your Luck</h3>
       <p>You could get lucky with our Top-Investors.</p>
-      <button id="luckBtn" class="lckbtn">Coming Soon</button>
+      <button id="luckBtn" class="tylbtn">🔒 Coming Soon</button>
 
   </div>
 </div>
@@ -576,7 +576,7 @@
   <div class="modal-content">
     <div class="chat-header">
       
-      <h3>BF Chat Room</h3>
+      <h3>AC Chat Room</h3>
       <div class="online-status">
   <span id="onlineCount">📡 0 users online</span>
 </div>
@@ -796,21 +796,18 @@ function launchConfetti() {
     <div class="footer-links">
       <div class="link-column">
         <h4>Product</h4>
-        <a href="#">Features</a>
-        <a href="#">Pricing</a>
-        <a href="#">Security</a>
+        <a href="features.html">Features</a>
+        <a href="privacy.html">Privacy/Security</a>
       </div>
       <div class="link-column">
         <h4>Company</h4>
-        <a href="#">About</a>
-        <a href="#">Careers</a>
-        <a href="#">Contact</a>
+        <a href="about.html">About</a>
+        <a href="faq.html">FAQ</a>
+        <a href="support.html">Support</a>
       </div>
       <div class="link-column">
         <h4>Resources</h4>
-        <a href="#">Blog</a>
-        <a href="#">Help Center</a>
-        <a href="#">Docs</a>
+        <a href="contact.html">Contact Us</a>
       </div>
     </div>
 

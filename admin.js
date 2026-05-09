@@ -4,17 +4,18 @@ import {
   getFirestore,
   collectionGroup,
   collection,
-  getDocs,
-  getDoc,
-  addDoc,
-  Timestamp,
-  setDoc,
-  query, orderBy, onSnapshot,
   doc,
-  updateDoc
+  getDoc,
+  setDoc,
+  updateDoc,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  Timestamp,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// 🔧 Your Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyCm7rYZgvhCjYoAr4_KzQcQovH1kClLtdI",
   authDomain: "aurumcaptial.firebaseapp.com",
@@ -25,701 +26,729 @@ const firebaseConfig = {
   measurementId: "G-Z14JZMBJT1"
 };
 
-// ✅ Initialize
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// --- GLOBAL STATE ---
 let currentChatUserId = "";
+let unsubscribeChatListener = null;
+let activeRecordListener = null;
+let allRecordsCache = []; // Stores all fetched records locally
+let activeChatUserId = null;
+let chatUnsubscribe = null;
+// 🎵 Sound effect for new messages
+const msgSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
 
 
-
-
-let unsubscribeChatListener = null; // 🔁 For stopping previous listeners
-
-window.viewMessages = function (userId) {
-
+// ✅ UNIVERSAL DATE FORMATTER: "23 Feb. 2006"
+window.formatAdminDate = (dateSource) => {
+  if (!dateSource) return "---";
   
-  currentChatUserId = userId;
-
-  // Show chat popup
-  document.getElementById("chatPopup").classList.remove("hidden");
-
-  // Reset chat box
-  const chatBox = document.getElementById("chatMessages");
-  chatBox.innerHTML = "<p class='loading'>Loading...</p>";
-
-  // 🛑 Unsubscribe previous listener (if exists)
-  if (unsubscribeChatListener) unsubscribeChatListener();
-
-  // Set up new listener
-  const q = query(
-    collection(db, `Support/${userId}/messages`),
-    orderBy("timestamp", "asc")
-  );
-
-  unsubscribeChatListener = onSnapshot(q, (snapshot) => {
-    chatBox.innerHTML = ""; // Clear before rendering
-
-    if (snapshot.empty) {
-      chatBox.innerHTML = "<p class='text-gray-400 italic'>No messages yet.</p>";
-    } else {
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const isAdmin = data.sender === "admin";
-
-        const msg = document.createElement("div");
-        msg.className = `chat-bubble ${isAdmin ? "from-admin" : "from-user"}`;
-        msg.textContent = `${isAdmin ? "💬 Support" : "👤 User"}: ${data.text}`;
-        chatBox.appendChild(msg);
-      });
-
-      // Auto scroll to bottom
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-  });
+  // Handle Firebase Timestamps or Date strings
+  const date = dateSource.toDate ? dateSource.toDate() : new Date(dateSource);
+  
+  const options = { 
+    day: '2-digit', 
+    month: 'short', 
+    year: 'numeric' 
+  };
+  
+  // Customizing to lowercase and adding the dot after the month
+  const parts = new Intl.DateTimeFormat('en-GB', options).formatToParts(date);
+  const day = parts.find(p => p.type === 'day').value;
+  const month = parts.find(p => p.type === 'month').value.toLowerCase();
+  const year = parts.find(p => p.type === 'year').value;
+  
+  return `${day} ${month}. ${year}`;
 };
 
-
-
-
-window.closeChat = function () {
-  document.getElementById("chatPopup").classList.add("hidden");
-  currentChatUserId = "";
-};
-
-window.sendChatMessage = async function () {
-  const input = document.getElementById("chatInput");
-  const text = input.value.trim();
-  if (!text || !currentChatUserId) return;
-
-  const ref = doc(collection(db, `Support/${currentChatUserId}/messages`));
-  await setDoc(ref, {
-    sender: "admin",
-    text,
-    timestamp: new Date()
-  });
-
-  input.value = "";
-  viewMessages(currentChatUserId); // Reload chat
-};
-
-
-// ✅ Helper
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-// ✅ Main Tabs: Deposits | Withdrawals
-document.getElementById("tabDeposits").addEventListener("click", () => {
+// --- INITIALIZATION ---
+document.addEventListener("DOMContentLoaded", () => {
+  startGlobalRecordListener();
+  setupRealTimeBadges();
+  setupTabListeners();
+  // Default Load: Deposits Tab -> which triggers the Pending sub-tab
   switchMainTab("deposits");
 });
-document.getElementById("tabWithdrawals").addEventListener("click", () => {
-  switchMainTab("withdrawals");
-});
 
-function switchMainTab(tab) {
-  document.querySelectorAll(".tab").forEach(btn => btn.classList.remove("active"));
-  document.querySelectorAll(".tab-content").forEach(div => div.classList.remove("active"));
+// ✅ FIX 1: IMPROVED REAL-TIME BADGE COUNTERS
+function setupRealTimeBadges() {
+  onSnapshot(collectionGroup(db, "records"), (snapshot) => {
+    const counts = {
+      depositPending: 0, depositTrue: 0, depositFalse: 0,
+      withdrawPending: 0, withdrawTrue: 0, withdrawFalse: 0
+    };
 
-  document.getElementById(`tab${capitalize(tab)}`).classList.add("active");
-  document.getElementById(`${tab}Content`).classList.add("active");
-}
-
-async function addFunds(userId) {
-  try {
-    // Check if user is blocked
-    const userRef = doc(db, "Users", userId);
-    const userSnap = await getDoc(userRef);
-
-    if (userSnap.exists() && userSnap.data().blocked === true) {
-      alert("❌ Cannot add funds — user is blocked.");
-      return;
-    }
-
-    // Prompt for amount
-    const input = prompt(`Enter amount to add to ${userId}'s wallet:`);
-    if (!input) return;
-
-    const amount = parseFloat(input);
-    if (isNaN(amount) || amount <= 0) {
-      alert("❌ Invalid amount.");
-      return;
-    }
-
-    // Get or create wallet document
-    const walletRef = doc(db, "Wallet", userId);
-    const walletSnap = await getDoc(walletRef);
-
-    let current = 0;
-    if (walletSnap.exists()) {
-      const data = walletSnap.data();
-      current = parseFloat(data.usd) || 0;
-    } else {
-      // Create wallet if it doesn't exist
-      await setDoc(walletRef, { usd: 0 });
-      console.log(`🆕 Wallet created for user: ${userId}`);
-    }
-
-    const newBalance = current + amount;
-
-    // Update wallet balance
-    await updateDoc(walletRef, { usd: newBalance });
-    alert(`✅ $${amount} added successfully. New balance: $${newBalance}`);
-
-    // Optional: reload UI
-    if (typeof loadUsers === "function") loadUsers();
-
-  } catch (err) {
-    console.error("🔥 Failed to add funds:", err);
-    alert("❌ Failed to add funds.");
-  }
-}
-
-
-// ✅ Sub-tab logic
-const subTabs = [
-  { btn: "depositTabPending", section: "depositPendingSection", status: "pending", type: "Deposits" },
-  { btn: "depositTabApproved", section: "depositApprovedSection", status: "true", type: "Deposits" },
-  { btn: "depositTabDeclined", section: "depositDeclinedSection", status: "false", type: "Deposits" },
-  { btn: "withdrawTabPending", section: "withdrawPendingSection", status: "pending", type: "Withdrawals" },
-  { btn: "withdrawTabApproved", section: "withdrawApprovedSection", status: "true", type: "Withdrawals" },
-  { btn: "withdrawTabDeclined", section: "withdrawDeclinedSection", status: "false", type: "Withdrawals" },
-];
-
-subTabs.forEach(({ btn, section, status, type }) => {
-  document.getElementById(btn).addEventListener("click", () => {
-    document.querySelectorAll(`#${type.toLowerCase()}Content .sub-tab`).forEach(el => el.classList.remove("active"));
-    document.querySelectorAll(`#${type.toLowerCase()}Content .sub-section`).forEach(el => el.classList.remove("active"));
-
-    document.getElementById(btn).classList.add("active");
-    document.getElementById(section).classList.add("active");
-
-    loadRecords(type, status, document.getElementById(section).querySelector("div"));
-  });
-});
-
-// ✅ Load from Firestore
-async function loadRecords(type, statusFilter, container) {
-  container.innerHTML = "<p>Loading...</p>";
-
-  try {
-    const snap = await getDocs(collectionGroup(db, "records"));
-    let count = 0;
-    let found = false;
-    container.innerHTML = "";
-
-    // We'll collect promises so we can await user + wallet fetches in parallel per doc
-    const renderPromises = [];
-
-    snap.forEach(docSnap => {
-      const path = docSnap.ref.path; // e.g. "Deposits/{userId}/records/{recordId}"
-      const parts = path.split("/");
-
-      // defensive: expect at least 4 parts
-      if (parts.length < 4) return;
-
-      const parentCollection = parts[0];              // "Deposits" or "Withdrawals"
-      const userId = parts[1];                        // user id
-      const sub = parts[2];                           // "records"
-      const recordId = parts[3];                      // record id
-
-      const isCorrectType = parentCollection === type;
+    snapshot.forEach(docSnap => {
+      const path = docSnap.ref.path;
       const data = docSnap.data();
-      const status = data.status?.toString();
-      const isPending = !["true", "false"].includes(status);
+      
+      // Strict path validation
+      const isDeposit = path.toLowerCase().startsWith("deposits");
+      const isWithdraw = path.toLowerCase().startsWith("withdrawals");
+      if (!isDeposit && !isWithdraw) return;
 
-      const shouldShow = (
-        (statusFilter === "pending" && isPending) ||
-        (statusFilter === status)
-      );
+      const type = isDeposit ? "deposit" : "withdraw";
+      const status = (data.status || "pending").toString().toLowerCase();
 
-      if (!isCorrectType || !shouldShow) return;
-
-      found = true;
-      count++;
-
-      // Fetch user name and wallet in parallel
-      renderPromises.push((async () => {
-        // Fetch user doc
-        let displayName = userId;
-        try {
-          const userRef = doc(db, "Users", userId);
-          const userSnap = await getDoc(userRef);
-          if (userSnap.exists()) {
-            const ud = userSnap.data();
-            displayName = ud.username || ud.name || ud.email || userId;
-          }
-        } catch (e) {
-          console.warn("Could not fetch user for", userId, e);
-        }
-
-        // Fetch wallet
-        let walletValue = "N/A";
-        try {
-          const walletRef = doc(db, "Wallet", userId);
-          const walletSnap = await getDoc(walletRef);
-          if (walletSnap.exists()) {
-            const w = walletSnap.data();
-            walletValue = typeof w.usd !== "undefined" ? Number(w.usd) : "N/A";
-          }
-        } catch (e) {
-          console.warn("Could not fetch wallet for", userId, e);
-        }
-
-        // Normalize date formatting
-        let dateStr = "Unknown";
-        const createdAt = data.createdAt ?? data.timestamp ?? null;
-        if (createdAt) {
-          try {
-            let dateObj;
-            if (typeof createdAt === "string") {
-              dateObj = new Date(createdAt);
-            } else if (typeof createdAt.toDate === "function") {
-              // Firestore Timestamp
-              dateObj = createdAt.toDate();
-            } else {
-              dateObj = new Date(createdAt);
-            }
-            if (!isNaN(dateObj)) {
-              dateStr = dateObj.toLocaleString();
-            }
-          } catch (e) {
-            console.warn("Date parse error:", e);
-          }
-        }
-
-        // Grab gift card type/proof fields if present
-        const cardType = data.cardType || data.type || "N/A";
-        const proof = data.proof || data.code || data.proofCode || "N/A";
-        const proofType = data.proofType || "N/A";
-        const amount = typeof data.amount !== "undefined" ? data.amount : (data.cardValue || "N/A");
-        const method = data.method || "N/A";
-        const statusText = data.status || (isPending ? "pending" : "N/A");
-
-        // Append rendered card to container
-        const cardEl = renderCard({
-          userId,
-          displayName,
-          recordId,
-          amount,
-          walletValue,
-          method,
-          dateStr,
-          status: statusText,
-          cardType,
-          proof,
-          proofType,
-          rawData: data,
-          type // Deposits / Withdrawals
-        });
-
-        container.appendChild(cardEl);
-      })());
+      if (status === "true") counts[`${type}True`]++;
+      else if (status === "false") counts[`${type}False`]++;
+      else counts[`${type}Pending`]++;
     });
 
-    await Promise.all(renderPromises);
+    // 1. Update Sub-tab Badge Numbers
+    Object.keys(counts).forEach(key => {
+      const id = key.replace("deposit", "depositCount").replace("withdraw", "withdrawCount");
+      const badge = document.getElementById(id);
+      if (badge) badge.textContent = counts[key];
+    });
 
-    if (!found) {
-      container.innerHTML = `<p class="text-gray-500 text-sm">No ${statusFilter} ${type.toLowerCase()} found.</p>`;
-    }
+    // 2. Trigger Main Tab Pulsing Alerts
+    const depositBtn = document.getElementById("tabDeposits");
+    const withdrawBtn = document.getElementById("tabWithdrawals");
 
-    // Update the tab count
-    const base = type === "Deposits" ? "deposit" : "withdraw";
-    const countId = `${base}Count${capitalize(statusFilter)}`;
-    console.log("🔍 Count ID:", countId);
-
-    const badge = document.getElementById(countId);
-    console.log("📛 Badge found:", badge);
-
-    if (badge) {
-      badge.textContent = count;
+    // If there are pending deposits, add the pulse class
+    if (counts.depositPending > 0) {
+      depositBtn?.classList.add("pulse-alert");
     } else {
-      console.warn(`⚠️ Could not find span with id="${countId}" in your HTML`);
+      depositBtn?.classList.remove("pulse-alert");
     }
 
-  } catch (err) {
-    console.error(`❌ Error loading ${type}:`, err);
-    container.innerHTML = `<p class="text-red-500">Error loading ${type.toLowerCase()}.</p>`;
-  }
+    // If there are pending withdrawals, add the pulse class
+    if (counts.withdrawPending > 0) {
+      withdrawBtn?.classList.add("pulse-alert");
+    } else {
+      withdrawBtn?.classList.remove("pulse-alert");
+    }
+  });
 }
 
-window.toggleBlockUser = async function toggleBlockUser(userId) {
-  try {
-    const userRef = doc(db, "Users", userId);
-    const snap = await getDoc(userRef);
-
-    if (!snap.exists()) {
-      alert("User not found.");
-      return;
-    }
-
-    const currentStatus = snap.data().blocked === true;
-    await updateDoc(userRef, { blocked: !currentStatus });
-
-    alert(currentStatus ? "✅ User unblocked" : "🚫 User blocked");
-
-    // Optional: Refresh the user list
-    loadUsers(); // Ensure you have a function that loads the full user list again
-
-  } catch (error) {
-    console.error("Error toggling block:", error);
-    alert("An error occurred while updating block status.");
-  }
-}
-
-let currentNotifyUserId = null;
-
-window.sendNotificationbox = function (userId) {
-  currentNotifyUserId = userId;
-  document.getElementById("notificationPopup").classList.remove("hidden");
-  document.getElementById("notifTitle").value = "";
-  document.getElementById("notifMessage").value = "";
-};
-
-window.closeNotificationBox = function () {
-  currentNotifyUserId = null;
-  document.getElementById("notificationPopup").classList.add("hidden");
-};
-
-
-window.sendNotificationMessage = async function () {
-  const title = document.getElementById("notifTitle").value.trim();
-  const message = document.getElementById("notifMessage").value.trim();
-
-  if (!title || !message) return alert("⚠️ Please fill in both fields.");
-  if (!currentNotifyUserId) return alert("⚠️ No user selected.");
-
-  try {
-    await addDoc(collection(db, "Notifications", currentNotifyUserId, "records"), {
-      title,
-      message,
-      from: "admin",
-      read: false,
-      timestamp: Timestamp.now()
-    });
-
-    alert("✅ Notification sent!");
-    window.closeNotificationBox();
-  } catch (err) {
-    console.error("❌ Failed to send notification:", err);
-    alert("Error sending notification.");
-  }
-};
-
-async function removeFunds(userId) {
-  const userSnap = await getDoc(doc(db, "Users", userId));
-  if (userSnap.exists() && userSnap.data().blocked === true) {
-    alert("❌ Cannot remove funds — user is blocked.");
-    return;
-  }
-
-  const input = prompt(`Enter amount to REMOVE from ${userId}'s wallet:`);
-
-  if (!input) return;
-  const amount = parseFloat(input);
-
-  if (isNaN(amount) || amount <= 0) {
-    alert("❌ Invalid amount.");
-    return;
-  }
-
-  try {
-    const walletRef = doc(db, "Wallet", userId);
-    const walletSnap = await getDoc(walletRef);
-
-    let current = 0;
-    if (walletSnap.exists()) {
-      const data = walletSnap.data();
-      current = parseFloat(data.usd) || 0;
-    }
-
-    if (amount > current) {
-      alert("❌ Cannot remove more than current balance.");
-      return;
-    }
-
-    const newBalance = current - amount;
-
-    await updateDoc(walletRef, { usd: newBalance });
-    alert(`✅ $${amount} removed. New balance: $${newBalance}`);
-
-    if (typeof loadUsers === "function") loadUsers();
-
-  } catch (err) {
-    console.error("🔥 Failed to remove funds:", err);
-    alert("❌ Failed to remove funds.");
-  }
-}
-
-window.removeFunds = removeFunds; // Register globally
 
 
 
-async function loadUsers() {
+window.viewMessages = async (userId) => {
+  const modal = document.getElementById("adminChatModal");
   
-  const container = document.getElementById("usersList");
-  container.innerHTML = "<p>Loading users...</p>";
-
-  try {
-    const snap = await getDocs(collection(db, "Users"));
-    container.innerHTML = "";
-
-    for (const docSnap of snap.docs) {
-      const user = docSnap.data();
-      const userId = docSnap.id;
-
-      // 🔄 Fetch wallet balance
-          let balance = 0;
-try {
-  const walletDoc = await getDoc(doc(db, "Wallet", userId));
-  if (walletDoc.exists()) {
-    const walletData = walletDoc.data();
-    balance = walletData.usd || 0; // ✅ the usd field is inside the Wallet/{userId} doc
+  // ✅ Safety Check: If modal doesn't exist, stop the error
+  if (!modal) {
+    console.error("Critical Error: 'adminChatModal' not found in HTML.");
+    alert("Chat Modal is missing from the HTML file.");
+    return;
   }
-} catch (e) {
-  console.warn(`⚠️ Error fetching wallet for ${userId}:`, e);
+
+  activeChatUserId = userId;
+  const msgContainer = document.getElementById("adminChatMessages");
+  const nameLabel = document.getElementById("chatTargetName");
+  const idLabel = document.getElementById("chatTargetId");
+
+  // Open Modal
+  modal.classList.remove("hidden");
+  idLabel.textContent = `UID: ${userId}`;
+
+  // Fetch specific user data to show who you are talking to
+  try {
+    const userDoc = await getDoc(doc(db, "Users", userId));
+    nameLabel.textContent = userDoc.exists() ? `Chat: ${userDoc.data().username}` : "Support Chat";
+  } catch (e) {
+    nameLabel.textContent = "Support Chat";
+  }
+
+  // Clear previous listeners
+  if (chatUnsubscribe) chatUnsubscribe();
+
+  // Load actual support messages from the specific user sub-collection
+  const q = query(collection(db, "Support", userId, "messages"), orderBy("timestamp"));
+  
+  chatUnsubscribe = onSnapshot(q, (snapshot) => {
+    msgContainer.innerHTML = "";
+    snapshot.forEach((doc) => {
+      const msg = doc.data();
+      const isAdmin = msg.sender !== "user"; // dashboard.js treats non-"user" as support[cite: 2]
+      
+      const div = document.createElement("div");
+      div.className = `max-w-[85%] p-3 rounded-2xl text-sm animate-slideUp ${
+        isAdmin 
+        ? "bg-indigo-600 text-white self-end rounded-tr-none" 
+        : "bg-white text-slate-800 self-start rounded-tl-none border border-slate-200"
+      }`;
+      
+      div.innerHTML = `<p>${msg.text}</p>`;
+      msgContainer.appendChild(div);
+    });
+    msgContainer.scrollTo({ top: msgContainer.scrollHeight, behavior: 'smooth' });
+  });
+};
+
+// ✅ Ensure the form handler is correctly stopping the refresh
+const adminChatForm = document.getElementById("adminChatForm");
+
+if (adminChatForm) {
+  adminChatForm.onsubmit = async (e) => {
+    // 1. STOP THE REFRESH IMMEDIATELY
+    e.preventDefault(); 
+    
+    const input = document.getElementById("adminChatInput");
+    const text = input.value.trim();
+
+    // 2. Validate input and active user
+    if (!text || !activeChatUserId) return;
+
+    try {
+      // 3. Send message to the Support sub-collection
+      const messagesRef = collection(db, "Support", activeChatUserId, "messages");
+      
+      await addDoc(messagesRef, {
+        sender: "support", // Dashboard.js recognizes this as the support agent
+        text: text,
+        timestamp: serverTimestamp()
+      });
+
+      // 4. Clear input and maintain focus for the next message
+      input.value = "";
+      input.focus(); 
+      
+      // The onSnapshot in viewMessages will automatically scroll the new message into view
+    } catch (err) {
+      console.error("Failed to send message:", err);
+      alert("Message failed to send. Check your connection.");
+    }
+  };
 }
 
-      const isBlocked = user.blocked === true;
+window.closeAdminChat = () => {
+  const modal = document.getElementById("adminChatModal");
+  if (modal) modal.classList.add("hidden");
+  if (chatUnsubscribe) chatUnsubscribe();
+  activeChatUserId = null;
+};
 
 
-      const card = document.createElement("div");
-      card.className = "p-4 bg-white shadow rounded space-y-2";
+// ✅ CENTRALIZED MAIN TAB SWITCHER
+function switchMainTab(tabName) {
+  // 1. Handle Main Tab Buttons
+  document.querySelectorAll(".tab").forEach(btn => {
+    btn.classList.remove("active", "border-blue-600"); // Remove active styles
+  });
+  
+  const tabBtn = document.getElementById(`tab${capitalize(tabName)}`);
+  if (tabBtn) {
+    tabBtn.classList.add("active", "border-blue-600"); // Add active styles
+    
+    // ✅ NEW: If clicking the Users tab, clear the pulse and save the timestamp
+    if (tabName.toLowerCase() === "users") {
+      localStorage.setItem('admin_last_viewed_users', Date.now());
+      tabBtn.classList.remove("pulse-alert");
+    }
+  }
 
-      card.innerHTML = `
-  <div class="user-card-content">
-    <h3 class="username font-bold text-xl text-blue-400 tracking-wide">${user.username || "Unnamed"}</h3>
-    <p><strong class="label">Email:</strong> <span class="text-slate-300">${user.email || "No email"}</span></p>
-    <p><strong class="label">Wallet:</strong> <span class="wallet-balance">$${balance}</span></p>
+  // 2. Toggle Main Tab Contents using Tailwind 'hidden'
+  document.querySelectorAll(".tab-content").forEach(content => {
+    content.classList.add("hidden"); 
+    content.classList.remove("active");
+  });
 
-    <div class="user-actions flex gap-2 flex-wrap mt-3">
-      <button onclick="sendNotificationbox('${userId}')" class="sendBtn">🔔 Notify</button>
-      <button onclick="viewMessages('${userId}')" class="replyBtn">📨 Messages</button>
-      <button onclick="addFunds('${userId}')" 
-        class="addFundsBtn ${isBlocked ? 'disabledBtn' : ''}" 
-        ${isBlocked ? 'disabled' : ''}>
-        ➕ Add Funds
-      </button>
-      <button onclick="removeFunds('${userId}')" 
-    class="removeFundsBtn ${isBlocked ? 'disabledBtn' : ''}" 
-    ${isBlocked ? 'disabled' : ''}>
-    ➖ Remove Funds
-  </button>
-      <button onclick="toggleBlockUser('${userId}')" class="blockBtn">
-      ${isBlocked ? '🔓 Unblock' : '🚫 Block'}
-    </button>
-    </div>
-  </div>
-`;
+  const activeContent = document.getElementById(`${tabName}Content`);
+  if (activeContent) {
+    activeContent.classList.remove("hidden");
+    activeContent.classList.add("active");
+  }
 
-
-      container.appendChild(card);
+  // 3. Sub-Tab Logic
+  if (tabName === "users") {
+    loadUsers(); // This will now run with the updated lastViewed timestamp
+  } else {
+    // Force reset: Hide ALL sub-sections inside this tab first to prevent overlap
+    if (activeContent) {
+      activeContent.querySelectorAll(".sub-section").forEach(sec => sec.classList.add("hidden"));
     }
 
-  } catch (err) {
-    console.error("❌ Failed to load users:", err);
-    container.innerHTML = `<p class="text-red-500">Failed to fetch users.</p>`;
+    // Default to "Pending" sub-tab
+    const subTabId = tabName === "deposits" ? "depositTabPending" : "withdrawTabPending";
+    const btn = document.getElementById(subTabId);
+    
+    if (btn) {
+      // Small delay ensures the DOM is ready for the click event
+      setTimeout(() => btn.click(), 10);
+    }
   }
 }
 
+// ✅ REAL-TIME SUB-TAB LOADER
+function startGlobalRecordListener() {
+  const q = query(collectionGroup(db, "records"));
+  
+  onSnapshot(q, (snapshot) => {
+    // 1. Sync the cache immediately
+    allRecordsCache = snapshot.docs.map(doc => ({
+      id: doc.id,
+      path: doc.ref.path,
+      data: doc.data()
+    }));
+    
+    // 2. Reactive Update: Refresh the visible list automatically
+    const activeSubTab = document.querySelector('.sub-tab.active');
+    if (activeSubTab) {
+      // Re-trigger the click logic to populate the list with new cache data
+      activeSubTab.click(); 
+    }
+    
+    console.log("Vault Synced: " + allRecordsCache.length + " records loaded.");
+  }, (error) => {
+    console.error("Global Listener Error:", error);
+  });
+}
 
-// ✅ Card Renderer
-function renderCard(info) {
-  const {
-    userId, displayName, recordId, amount, walletValue,
-    method, dateStr, status, cardType, proof, proofType, rawData, type
-  } = info;
 
-  const wrapper = document.createElement("div");
-  wrapper.className = "p-4 bg-white border rounded shadow space-y-1 sub-record-card";
 
-  const isPending = !["true", "false"].includes((rawData.status || "").toString());
 
-  // 🧠 Format date nicely if valid
-  const formattedDate = dateStr
-    ? new Date(dateStr).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })
-    : "Unknown";
+// ✅ UPDATED: Now performs instant filtering from cache
+async function loadRecords(type, statusFilter, containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
 
-  // 🧩 Base HTML
-  let html = `
-    <p class="text-sm">
-      <strong>User:</strong> ${escapeHtml(displayName)} 
-      <span class="text-xs text-slate-400">(${escapeHtml(userId)})</span>
-    </p>
-    <p><strong>Amount:</strong> $${escapeHtml(amount)}</p>
-    <p><strong>Wallet:</strong> ${walletValue === "N/A" ? "N/A" : `$${escapeHtml(walletValue)}`}</p>
-    <p><strong>Method:</strong> ${escapeHtml(method)}</p>
-  `;
-
-  // 🎁 Only add GiftCard fields when method is GiftCard
-  if (method === "GiftCard") {
-    html += `
-      <p><strong>Gift Type:</strong> ${escapeHtml(cardType || "N/A")}</p>
-      <p><strong>Proof (${escapeHtml(proofType || "code")}):</strong> <code>${escapeHtml(proof || "N/A")}</code></p>
-    `;
-  }
-
-  // 📅 Add date + status
-  html += `
-    <p><strong>Date:</strong> ${escapeHtml(formattedDate)}</p>
-    <p><strong>Status:</strong> ${escapeHtml(status)}</p>
-  `;
-
-  // 🧾 Add action buttons if pending
-  if (isPending) {
-    html += `
-      <div class="flex gap-2 mt-2">
-        <button 
-          class="approveBtn bg-green-500 text-white px-2 py-1 rounded text-sm hover:bg-green-600 transition"
-          data-user="${userId}" 
-          data-id="${recordId}" 
-          data-type="${type}"
-        >✅ Approve</button>
-        <button 
-          class="declineBtn bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600 transition"
-          data-user="${userId}" 
-          data-id="${recordId}" 
-          data-type="${type}"
-        >❌ Decline</button>
+  // 1. Check if we are still in the "Initial Sync" phase
+  // If the cache is empty, we MUST show the loader and wait
+  if (allRecordsCache.length === 0) {
+    container.innerHTML = `
+      <div class="flex flex-col items-center justify-center p-12 space-y-4 animate-pulse">
+        <div class="w-12 h-12 border-4 border-slate-200 border-t-indigo-600 rounded-full animate-spin"></div>
+        <p class="text-indigo-600 font-semibold tracking-wide">Fetching ${statusFilter} ${type}...</p>
       </div>
     `;
+    return; // Stop here and wait for the Global Listener to trigger the refresh
   }
 
-  wrapper.innerHTML = html;
+  const fragment = document.createDocumentFragment();
+  let found = false;
 
-  // Attach buttons listeners for this card
-  attachAdminActions(wrapper);
+  // 2. Filter from the now-populated cache
+  const filteredRecords = allRecordsCache.filter(item => {
+    const fullPath = item.path.toLowerCase();
+    const typeMatch = fullPath.startsWith(type.toLowerCase());
+    if (!typeMatch) return false;
 
+    const status = (item.data.status || "pending").toString().toLowerCase();
+    const isPending = !["true", "false"].includes(status);
+    return (statusFilter === "pending" && isPending) || (statusFilter === status);
+  });
+
+  // 3. Render the list
+  if (filteredRecords.length > 0) {
+    for (const item of filteredRecords) {
+      found = true;
+      const parts = item.path.split("/");
+      const userId = parts[1];
+      const card = await renderRecordCard(userId, item.id, item.data, type);
+      fragment.appendChild(card);
+    }
+    container.innerHTML = ""; 
+    container.appendChild(fragment);
+  } else {
+    // 4. Only show "No records found" if we are 100% sure the cache is loaded and empty[cite: 1]
+    const label = statusFilter === "true" ? "approved" : statusFilter === "false" ? "declined" : "pending";
+    container.innerHTML = `
+      <div class="p-12 text-center text-slate-400 italic border-2 border-dashed border-slate-200 rounded-2xl">
+        No ${label} ${type.toLowerCase()} found in database.
+      </div>`;
+  }
+}
+
+
+
+
+// ✅ USERS CARD RENDERER
+// ✅ USERS CARD RENDERER WITH WALLET & COPY FUNCTION
+async function renderRecordCard(userId, recordId, data, type) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "record-card animate-slideUp";
+  
+  const userSnap = await getDoc(doc(db, "Users", userId));
+  const username = userSnap.exists() ? (userSnap.data().username || "User") : userId;
+
+  const date = data.timestamp?.toDate ? data.timestamp.toDate() : new Date(data.createdAt || Date.now());
+  const formattedDate = formatAdminDate(data.timestamp || data.createdAt);
+
+  // Check if wallet exists and create the Full Wallet UI
+  const walletHtml = data.wallet 
+    ? `<div class="mt-3 p-3 bg-slate-900 rounded-lg border border-slate-700">
+        <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold block mb-2">Destination Wallet</span>
+        <div class="flex items-center justify-between gap-3">
+          <code id="wallet-${recordId}" class="text-xs text-emerald-400 font-mono break-all leading-relaxed">${data.wallet}</code>
+          <button onclick="copyToClipboard('${data.wallet}', 'btn-copy-${recordId}')" 
+                  id="btn-copy-${recordId}"
+                  class="flex-shrink-0 p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-md transition-colors border border-slate-600"
+                  title="Copy Address">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
+        </div>
+       </div>` 
+    : "";
+
+  wrapper.innerHTML = `
+    <div class="record-info w-full">
+      <div class="flex justify-between items-start mb-2">
+        <div>
+          <span class="font-bold text-indigo-600 text-base">${username}</span>
+          <p class="user-id">UID: ${userId}</p>
+        </div>
+        <span class="text-[11px] text-slate-400 font-medium">${formattedDate}</span>
+      </div>
+      
+      <div class="flex items-center gap-3 mb-1">
+        <span class="amount text-emerald-600 text-xl font-bold">$${data.amount || data.cardValue || 0}</span>
+        <span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] rounded uppercase font-bold tracking-tighter border border-slate-200">
+          ${data.method || "Transfer"}
+        </span>
+      </div>
+
+      ${walletHtml}
+      
+      ${data.method === "GiftCard" ? `<p class="text-xs bg-amber-50 text-amber-700 p-2 rounded mt-2 border border-amber-100 font-medium">Code: ${data.proof || data.code}</p>` : ""}
+
+      <div class="mt-4 flex gap-3">
+        ${!["true", "false"].includes(data.status?.toString().toLowerCase()) ? `
+          <button onclick="processAction('${type}', '${userId}', '${recordId}', 'approve')" class="btn-approve flex-1">Approve Request</button>
+          <button onclick="processAction('${type}', '${userId}', '${recordId}', 'decline')" class="btn-decline">Decline</button>
+        ` : `
+          <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest ${data.status === 'true' ? 'text-emerald-500' : 'text-rose-500'}">
+            ${data.status === 'true' ? '<span>✅ Transaction Confirmed</span>' : '<span>❌ Request Rejected</span>'}
+          </div>
+        `}
+      </div>
+    </div>
+  `;
   return wrapper;
 }
 
+// ✅ GLOBAL COPY FUNCTION
+window.copyToClipboard = (text, btnId) => {
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById(btnId);
+    const originalContent = btn.innerHTML;
+    
+    // Visual Feedback
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+    btn.classList.add('border-emerald-500');
+    
+    setTimeout(() => {
+      btn.innerHTML = originalContent;
+      btn.classList.remove('border-emerald-500');
+    }, 2000);
+  });
+};
 
-/** small HTML-escape helper to avoid accidental injection when displaying DB strings */
-function escapeHtml(str) {
-  if (str === null || typeof str === "undefined") return "";
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
 
 
+window.sendNotificationbox = async (userId) => {
+  const message = prompt("Enter the notification message for this user:");
+  
+  if (!message || message.trim() === "") {
+    return; // Cancel if empty
+  }
 
-// ✅ Button Actions
-function attachAdminActions(container) {
-  // Approve buttons
-  container.querySelectorAll(".approveBtn").forEach(btn => {
-    // Avoid attaching duplicate listeners
-    if (btn._attached) return;
-    btn._attached = true;
-
-    btn.addEventListener("click", async () => {
-      const { user, id, type } = btn.dataset;
-      const recordRef = doc(db, type, user, "records", id);
-      const walletRef = doc(db, "Wallet", user);
-
-      try {
-        // 1. Get transaction data
-        const recordSnap = await getDoc(recordRef);
-        if (!recordSnap.exists()) {
-          alert("❌ Record not found");
-          return;
-        }
-
-        const record = recordSnap.data();
-        const amount = Number(record.amount || record.cardValue || 0);
-        if (isNaN(amount)) {
-          alert("❌ Invalid amount");
-          return;
-        }
-
-        // 2. Get current wallet balance
-        const walletSnap = await getDoc(walletRef);
-        const currentBalance = walletSnap.exists()
-          ? Number(walletSnap.data().usd || walletSnap.data().walletBalance || 0)
-          : 0;
-
-        // update balance
-        let newBalance = currentBalance;
-        if (type === "Deposits") {
-          newBalance = currentBalance + amount;
-        } else if (type === "Withdrawals") {
-          newBalance = currentBalance - amount;
-          if (newBalance < 0) {
-            alert("❌ Not enough balance in wallet");
-            return;
-          }
-        }
-
-        // Use setDoc with merge to create wallet if missing
-        await setDoc(walletRef, { usd: newBalance }, { merge: true });
-        await updateDoc(recordRef, { status: "true" });
-
-        alert("✅ Approved and wallet updated");
-        // emit refresh event to parent sub-section
-        btn.closest(".sub-section")?.dispatchEvent(new Event("refresh"));
-      } catch (err) {
-        console.error("❌ Approval error:", err);
-        alert("❌ Something went wrong during approval");
-      }
+  try {
+    // Reference: Notifications -> {userId} -> records
+    const notifRef = collection(db, "Notifications", userId, "records");
+    
+    await addDoc(notifRef, {
+      message: message,
+      type: "admin_alert", // Optional: for different styling on dashboard
+      read: false,         // Required: triggers the 'count > 0' logic
+      timestamp: serverTimestamp(),
+      sender: "Starjay Admin"
     });
-  });
 
-  // Decline buttons
-  container.querySelectorAll(".declineBtn").forEach(btn => {
-    if (btn._attached) return;
-    btn._attached = true;
+    alert("Notification sent successfully!");
+  } catch (error) {
+    console.error("Error sending notification:", error);
+    alert("Failed to send notification. Check console.");
+  }
+};
 
-    btn.addEventListener("click", async () => {
-      const { user, id, type } = btn.dataset;
-      const ref = doc(db, type, user, "records", id);
-      try {
-        await updateDoc(ref, { status: "false" });
-        alert("❌ Declined");
-        btn.closest(".sub-section")?.dispatchEvent(new Event("refresh"));
-      } catch (err) {
-        console.error("❌ Decline error:", err);
-        alert("❌ Could not decline the record");
-      }
+
+
+// ✅ REAL-TIME USERS LOADER
+window.loadUsers = function() {
+  const container = document.getElementById("usersList");
+  if (!container) return;
+
+  onSnapshot(collection(db, "Users"), (snapshot) => {
+    container.innerHTML = "";
+    
+    const userList = [];
+    snapshot.forEach(doc => userList.push({ id: doc.id, ...doc.data() }));
+    
+    // 1. Sort by newest registration first
+    userList.sort((a, b) => {
+      const timeA = a.createdAt?.toDate?.() || new Date(a.createdAt || 0);
+      const timeB = b.createdAt?.toDate?.() || new Date(b.createdAt || 0);
+      return timeB - timeA; 
     });
+
+    // Get the timestamp of the last time the admin viewed this tab
+    const lastViewed = parseInt(localStorage.getItem('admin_last_viewed_users') || 0);
+
+    userList.forEach((userData) => {
+      const userId = userData.id;
+      const rawDate = userData.createdAt?.toDate?.() || new Date(userData.createdAt || Date.now());
+      const regDateFormatted = formatAdminDate(userData.createdAt);
+      
+      // 2. Individual Card Logic: Show "NEW" badge for 24 hours
+      const hoursSinceReg = (new Date() - rawDate) / (1000 * 60 * 60);
+      const isNewFor24h = hoursSinceReg < 24;
+
+      const userCard = document.createElement("div");
+      userCard.className = `record-card animate-slideUp ${isNewFor24h ? 'border-l-4 border-indigo-500' : ''}`;
+      
+      userCard.innerHTML = `
+    <div class="record-info w-full">
+      <div class="flex justify-between items-start">
+        <div class="flex items-center gap-2">
+          <h3 class="font-bold text-indigo-700 text-lg">${userData.username || "Unnamed"}</h3>
+          ${isNewFor24h ? '<span class="badge-new">NEW</span>' : ''}
+        </div>
+        <span class="text-[10px] text-slate-500 font-mono font-bold">${regDateFormatted}</span>
+      </div>
+      
+      <p class="text-sm text-slate-600 mb-3">${userData.email || "No Email"}</p>
+      
+      <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 mb-3">
+         <span class="text-[9px] uppercase text-slate-500 font-bold block mb-1">Available Balance</span>
+         <span class="wallet-val text-xl font-black text-emerald-700" id="bal-${userId}">$0</span>
+      </div>
+
+      <!-- ✅ GRADIENT FINANCIAL CONTROLS -->
+      <div class="flex gap-2 mb-2">
+         <button onclick="adjustBalance('${userId}', 'add')" 
+                 class="btn-gradient-blue flex-1 py-2.5 text-white text-[11px] font-bold rounded-md flex items-center justify-center gap-1">
+           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+           ADD FUNDS
+         </button>
+         <button onclick="adjustBalance('${userId}', 'minus')" 
+                 class="btn-gradient-blue flex-1 py-2.5 text-white text-[11px] font-bold rounded-md flex items-center justify-center gap-1">
+           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+           MINUS FUNDS
+         </button>
+      </div>
+
+      <!-- ✅ GRADIENT MANAGEMENT CONTROLS -->
+      <div class="flex gap-2 flex-wrap">
+         <button onclick="sendNotificationbox('${userId}')" class="btn-gradient-blue flex-1 py-2 text-[11px] font-bold">🔔 Notify</button>
+         <button onclick="viewMessages('${userId}')" class="btn-gradient-blue flex-1 py-2 text-[11px] font-bold">📨 Chat</button>
+         <button onclick="toggleBlockUser('${userId}')" class="btn-gradient-blue text-[11px] px-3 py-2 font-bold">
+            ${userData.blocked ? '🔓 Unblock' : '🚫 Block'}
+         </button>
+      </div>
+    </div>
+  `;
+      container.appendChild(userCard);
+
+      onSnapshot(doc(db, "Wallet", userId), (wSnap) => {
+        const balEl = document.getElementById(`bal-${userId}`);
+        if (balEl) balEl.textContent = `$${wSnap.exists() ? (wSnap.data().usd || 0).toLocaleString() : 0}`;
+      });
+    });
+
+    // 3. Tab Badge Logic: Pulse only for users registered AFTER the last visit[cite: 1]
+    const hasUnseenUsers = userList.some(u => {
+      const regTime = u.createdAt?.toDate?.()?.getTime() || new Date(u.createdAt || 0).getTime();
+      return regTime > lastViewed;
+    });
+    
+    const userTabBtn = document.getElementById("tabUsers");
+    const isCurrentlyOnUserTab = userTabBtn?.classList.contains('active');
+
+    // Only alert if there are unseen users AND the admin isn't currently looking at the list[cite: 1]
+    if (hasUnseenUsers && !isCurrentlyOnUserTab) {
+      userTabBtn?.classList.add("pulse-alert");
+    } else {
+      userTabBtn?.classList.remove("pulse-alert");
+    }
   });
-}
+};
 
 
-// ✅ Auto Refresh After Status Change
-document.querySelectorAll(".sub-section").forEach(section => {
-  section.addEventListener("refresh", () => {
-    const tabBtn = section.id.replace("Section", "Tab");
-    const tabEl = document.getElementById(tabBtn);
-    if (tabEl) tabEl.click(); // simulate refresh only if element exists
+window.adjustBalance = async (userId, action) => {
+  const amountStr = prompt(`Enter amount to ${action === 'add' ? 'add to' : 'deduct from'} user balance:`);
+  const amount = parseFloat(amountStr);
+
+  if (isNaN(amount) || amount <= 0) {
+    alert("Please enter a valid positive number.");
+    return;
+  }
+
+  const walletRef = doc(db, "Wallet", userId);
+
+  try {
+    const wSnap = await getDoc(walletRef);
+    const currentBalance = wSnap.exists() ? (wSnap.data().usd || 0) : 0;
+    
+    let newBalance;
+    if (action === 'add') {
+      newBalance = currentBalance + amount;
+    } else {
+      if (currentBalance < amount) {
+        if (!confirm("User has insufficient funds. Proceed with negative balance?")) return;
+      }
+      newBalance = currentBalance - amount;
+    }
+
+    await setDoc(walletRef, { usd: newBalance }, { merge: true });
+    
+    // UI updates automatically because of the onSnapshot listener in loadUsers
+    console.log(`Successfully ${action === 'add' ? 'added' : 'deducted'} $${amount}`);
+  } catch (error) {
+    console.error("Balance update failed:", error);
+    alert("Failed to update balance. Check console for details.");
+  }
+};
+
+// ✅ ACTIONS
+window.processAction = async (type, userId, recordId, action) => {
+  // 1. Identify the card in the DOM immediately
+  // We look for the card that contains this specific recordId
+  const recordCards = document.querySelectorAll('.record-card, .animate-slideUp');
+  let targetCard = null;
+  
+  recordCards.forEach(card => {
+    // Check if the buttons inside this card belong to this record
+    if (card.innerHTML.includes(`'${recordId}'`)) {
+      targetCard = card;
+    }
   });
+
+  // 2. Optimistic UI Update: Hide the card immediately with a fade-out
+  if (targetCard) {
+    targetCard.style.transition = "all 0.3s ease";
+    targetCard.style.opacity = "0";
+    targetCard.style.transform = "translateX(20px)";
+    
+    // Remove from DOM after animation
+    setTimeout(() => {
+      targetCard.remove();
+      
+      // If the container is now empty, show the "No pending" message
+      const container = targetCard.parentElement;
+      if (container && container.children.length === 0) {
+        container.innerHTML = `<div class="p-10 text-center text-gray-400 italic">No pending ${type.toLowerCase()} found.</div>`;
+      }
+    }, 300);
+  }
+
+  // 3. Database Operations (Running in the background)
+  const recordRef = doc(db, type, userId, "records", recordId);
+  const walletRef = doc(db, "Wallet", userId);
+
+  try {
+    if (action === "approve") {
+      const snap = await getDoc(recordRef);
+      if (!snap.exists()) return;
+      
+      const amount = Number(snap.data().amount || snap.data().cardValue || 0);
+      const wSnap = await getDoc(walletRef);
+      const current = Number(wSnap.exists() ? (wSnap.data().usd || 0) : 0);
+
+      // Update Wallet balance
+      await setDoc(walletRef, { 
+        usd: type === "Deposits" ? current + amount : current - amount 
+      }, { merge: true });
+      
+      // Mark as approved
+      await updateDoc(recordRef, { status: "true" });
+    } else {
+      // Mark as declined
+      await updateDoc(recordRef, { status: "false" });
+    }
+    
+    console.log(`${type} ${action}d successfully`);
+  } catch (e) {
+    console.error("Action failed:", e);
+    // Optional: Restore the card if the database update fails
+    alert("Error processing action. Please refresh.");
+  }
+};
+
+// ✅ TAB LISTENERS
+function setupTabListeners() {
+  document.getElementById("tabDeposits").onclick = () => switchMainTab("deposits");
+  document.getElementById("tabWithdrawals").onclick = () => switchMainTab("withdrawals");
+  document.getElementById("tabUsers").onclick = () => switchMainTab("users");
+
+  const subMapping = [
+    { id: "depositTabPending", type: "Deposits", status: "pending", list: "depositPendingList" },
+    { id: "depositTabApproved", type: "Deposits", status: "true", list: "depositApprovedList" },
+    { id: "depositTabDeclined", type: "Deposits", status: "false", list: "depositDeclinedList" },
+    { id: "withdrawTabPending", type: "Withdrawals", status: "pending", list: "withdrawPendingList" },
+    { id: "withdrawTabApproved", type: "Withdrawals", status: "true", list: "withdrawApprovedList" },
+    { id: "withdrawTabDeclined", type: "Withdrawals", status: "false", list: "withdrawDeclinedList" }
+  ];
+
+  subMapping.forEach(m => {
+  const btn = document.getElementById(m.id);
+  if (btn) {
+    btn.onclick = () => {
+      const parent = btn.parentElement;
+      if (!parent) return;
+
+      // 1. Update Sub-Tab Button UI
+      parent.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active', 'bg-blue-100'));
+      btn.classList.add('active', 'bg-blue-100');
+
+      // 2. Resolve Section ID (Handles 'PendingSection' or 'SectionPending')
+      const pattern1 = m.id.replace('Tab', 'Section'); // e.g., depositSectionPending
+      const pattern2 = m.id.replace('Tab', '') + 'Section'; // e.g., depositPendingSection
+      
+      const targetSection = document.getElementById(pattern1) || document.getElementById(pattern2);
+      
+      if (targetSection) {
+        // Hide all sibling sections in the main tab content
+        const mainContent = btn.closest('.tab-content');
+        mainContent.querySelectorAll('.sub-section').forEach(s => {
+          s.classList.add('hidden');
+          s.classList.remove('active');
+        });
+
+        // Show the correct one
+        targetSection.classList.remove('hidden');
+        targetSection.classList.add('active');
+      } else {
+        console.error(`Could not find section for ${m.id}. tried: ${pattern1}, ${pattern2}`);
+      }
+
+      // 3. Load the data
+      loadRecords(m.type, m.status, m.list);
+    };
+  }
 });
-
-// ✅ Load Default Tab (safe check)
-const depPending = document.getElementById("depositTabPending");
-if (depPending) depPending.click();
-
-// ✅ Users tab
-const tabUsers = document.getElementById("tabUsers");
-if (tabUsers) {
-  tabUsers.addEventListener("click", () => {
-    switchMainTab("users");
-    loadUsers(); // 🔥 Load users when tab opens
-  });
 }
 
-// ✅ Expose global functions
-window.addFunds = addFunds;
+// ✅ HELPERS
+function capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
 
-// ✅ Close chat safely
-const closeChatBtn = document.getElementById("closeChat");
-if (closeChatBtn) {
-  closeChatBtn.addEventListener("click", () => {
-    if (unsubscribeChatListener) unsubscribeChatListener();
-    const popup = document.getElementById("chatPopup");
-    if (popup) popup.classList.add("hidden");
+
+
+window.toggleBlockUser = async (userId) => {
+  const ref = doc(db, "Users", userId);
+  const snap = await getDoc(ref);
+  await updateDoc(ref, { blocked: !snap.data().blocked });
+};
+
+window.sendNotificationbox = (userId) => {
+  window.currentNotifyUserId = userId;
+  document.getElementById("notificationPopup").classList.remove("hidden");
+};
+
+window.closeNotificationBox = () => document.getElementById("notificationPopup").classList.add("hidden");
+
+window.sendNotificationMessage = async () => {
+  const title = document.getElementById("notifTitle").value;
+  const msg = document.getElementById("notifMessage").value;
+  await addDoc(collection(db, "Notifications", window.currentNotifyUserId, "records"), {
+    title, message: msg, from: "admin", read: false, timestamp: Timestamp.now()
   });
-}
+  alert("Notification Sent");
+  closeNotificationBox();
+};
+
+
 

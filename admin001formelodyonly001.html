@@ -2,75 +2,84 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin Panel - Deposits & Withdrawals</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - AurumCapital</title>
   <link rel="stylesheet" href="admin.css" />
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
 </head>
-<body>
-  <h2 class="text-2xl font-bold mb-4">AurumCaptial Admin Panel</h2>
+<body class="bg-gray-100 min-h-screen p-4">
 
-  <!-- Primary Tabs: Deposits | Withdrawals -->
-  <div class="tabs">
-    <button id="tabDeposits" class="tab active">💰 Deposits</button>
-    <button id="tabWithdrawals" class="tab">💸 Withdrawals</button>
-    <!-- Add this next to tabDeposits and tabWithdrawals -->
-<button id="tabUsers" class="tab">👥 Users</button>
+  <header class="mb-6">
+    <h2 class="text-3xl font-extrabold text-blue-900">AurumCapital Admin</h2>
+    <p class="text-gray-500">Manage deposits, withdrawals, and user accounts.</p>
+  </header>
+
+  <!-- Primary Tabs -->
+  <div class="tabs flex gap-2 mb-6 border-b border-gray-300">
+    <button id="tabDeposits" class="tab pb-2 px-4 font-semibold border-b-2 border-transparent">💰 Deposits</button>
+    <button id="tabWithdrawals" class="tab pb-2 px-4 font-semibold border-b-2 border-transparent">💸 Withdrawals</button>
+    <button id="tabUsers" class="tab pb-2 px-4 font-semibold border-b-2 border-transparent">👥 Users</button>
   </div>
 
-  <!-- ========== Deposits Tab Content ========== -->
-  <div id="depositsContent" class="tab-content active">
-    <!-- Sub-Tabs -->
-    <button id="depositTabPending" class="sub-tab">
-  ⏳ Pending (<span id="depositCountPending">0</span>)
-</button>
+  <!-- ========== Deposits Content ========== -->
+  <div id="depositsContent" class="tab-content hidden">
+    <!-- Added a wrapper for sub-tabs to fix the JavaScript parent navigation -->
+    <div class="sub-tabs-wrapper flex gap-4 mb-4">
+      <button id="depositTabPending" class="sub-tab px-4 py-2 rounded-lg bg-white shadow-sm border">
+        ⏳ Pending - <span id="depositCountPending"> 0</span>
+      </button>
+      <button id="depositTabApproved" class="sub-tab px-4 py-2 rounded-lg bg-white shadow-sm border">
+        ✅ Approved - <span id="depositCountTrue"> 0</span>
+      </button>
+      <button id="depositTabDeclined" class="sub-tab px-4 py-2 rounded-lg bg-white shadow-sm border">
+        ⛔ Declined - <span id="depositCountFalse"> 0</span>
+      </button>
+    </div>
 
-<button id="depositTabApproved" class="sub-tab">
-  ✅ Approved (<span id="depositCountTrue">0</span>)
-</button>
-
-<button id="depositTabDeclined" class="sub-tab">
-  ⛔ Declined (<span id="depositCountFalse">0</span>)
-</button>
-
-    <!-- Sub-Tab Sections -->
-    <section id="depositPendingSection" class="sub-section active">
-      <h3>Pending Deposits</h3>
-      <div id="depositPendingList"></div>
+    <section id="depositPendingSection" class="sub-section hidden p-4 bg-white rounded-xl shadow-md">
+      <h3 class="text-lg font-bold mb-4 text-gray-700">Pending Deposits</h3>
+      <div id="depositPendingList" class="space-y-3"></div>
     </section>
 
-    <section id="depositApprovedSection" class="sub-section">
-      <h3>Approved Deposits</h3>
-      <div id="depositApprovedList"></div>
+    <section id="depositApprovedSection" class="sub-section hidden p-4 bg-white rounded-xl shadow-md">
+      <h3 class="text-lg font-bold mb-4 text-gray-700">Approved Deposits</h3>
+      <div id="depositApprovedList" class="space-y-3"></div>
     </section>
 
-    <section id="depositDeclinedSection" class="sub-section">
-      <h3>Declined Deposits</h3>
-      <div id="depositDeclinedList"></div>
+    <section id="depositDeclinedSection" class="sub-section hidden p-4 bg-white rounded-xl shadow-md">
+      <h3 class="text-lg font-bold mb-4 text-gray-700">Declined Deposits</h3>
+      <div id="depositDeclinedList" class="space-y-3"></div>
     </section>
   </div>
 
-  <!-- ========== Withdrawals Tab Content ========== -->
-  <div id="withdrawalsContent" class="tab-content">
-    <!-- Sub-Tabs -->
-    <button id="withdrawTabPending" class="sub-tab">⏳ Pending (<span id="withdrawCountPending">0</span>)</button>
-<button id="withdrawTabApproved" class="sub-tab">✅ Approved (<span id="withdrawCountTrue">0</span>)</button>
-<button id="withdrawTabDeclined" class="sub-tab">⛔ Declined (<span id="withdrawCountFalse">0</span>)</button>
+  <!-- ========== Withdrawals Content ========== -->
+  <div id="withdrawalsContent" class="tab-content hidden">
+    <!-- Added a wrapper for sub-tabs -->
+    <div class="sub-tabs-wrapper flex gap-4 mb-4">
+      <button id="withdrawTabPending" class="sub-tab px-4 py-2 rounded-lg bg-white shadow-sm border">
+        ⏳ Pending - <span id="withdrawCountPending">0</span>
+      </button>
+      <button id="withdrawTabApproved" class="sub-tab px-4 py-2 rounded-lg bg-white shadow-sm border">
+        ✅ Approved - <span id="withdrawCountTrue">0</span>
+      </button>
+      <button id="withdrawTabDeclined" class="sub-tab px-4 py-2 rounded-lg bg-white shadow-sm border">
+        ⛔ Declined - <span id="withdrawCountFalse">0</span>
+      </button>
+    </div>
 
-    <!-- Sub-Tab Sections -->
-    <section id="withdrawPendingSection" class="sub-section active">
-      <h3>Pending Withdrawals</h3>
-      <div id="withdrawPendingList"></div>
+    <section id="withdrawPendingSection" class="sub-section hidden p-4 bg-white rounded-xl shadow-md">
+      <h3 class="text-lg font-bold mb-4 text-gray-700">Pending Withdrawals</h3>
+      <div id="withdrawPendingList" class="space-y-3"></div>
     </section>
 
-    <section id="withdrawApprovedSection" class="sub-section">
-      <h3>Approved Withdrawals</h3>
-      <div id="withdrawApprovedList"></div>
+    <section id="withdrawApprovedSection" class="sub-section hidden p-4 bg-white rounded-xl shadow-md">
+      <h3 class="text-lg font-bold mb-4 text-gray-700">Approved Withdrawals</h3>
+      <div id="withdrawApprovedList" class="space-y-3"></div>
     </section>
 
-    <section id="withdrawDeclinedSection" class="sub-section">
-      <h3>Declined Withdrawals</h3>
-      <div id="withdrawDeclinedList"></div>
+    <section id="withdrawDeclinedSection" class="sub-section hidden p-4 bg-white rounded-xl shadow-md">
+      <h3 class="text-lg font-bold mb-4 text-gray-700">Declined Withdrawals</h3>
+      <div id="withdrawDeclinedList" class="space-y-3"></div>
     </section>
   </div>
 
@@ -82,22 +91,40 @@
 </section>
 
 
-<!-- Chat Popup -->
-<div id="chatPopup" class="chat-popup hidden">
-  <div class="chat-box">
-    <div class="chat-header">
-      <h3 id="chatUsername">Chat with User</h3>
-      <button onclick="closeChat()" class="chat-close">✖</button>
+
+
+<div id="adminChatModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center p-4">
+  <div class="bg-white w-full max-w-[450px] h-[600px] max-h-[85vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+    
+    <!-- Header (Pinned) -->
+    <div class="shrink-0 p-4 bg-indigo-700 text-white flex justify-between items-center">
+      <div>
+        <h4 id="chatTargetName" class="font-bold text-sm">Support Chat</h4>
+        <p id="chatTargetId" class="text-[10px] opacity-70 font-mono"></p>
+      </div>
+      <button onclick="closeAdminChat()" class="p-2 hover:bg-white/20 rounded-full">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
     </div>
-    <div id="chatMessages" class="chat-messages">
-      <p class="loading">Loading...</p>
+
+    <!-- Messages Area (The only part that scrolls)[cite: 2] -->
+    <div id="adminChatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
+      <!-- Messages inject here -->
     </div>
-    <div class="chat-input-box">
-      <input type="text" id="chatInput" placeholder="Type a message..." />
-      <button onclick="sendChatMessage()">Send</button>
-    </div>
+
+    <!-- Input Area (Pinned)[cite: 2] -->
+    <form id="adminChatForm" class="shrink-0 p-4 bg-white border-t border-slate-100 flex gap-2">
+      <input type="text" id="adminChatInput" autocomplete="off" placeholder="Message..." 
+             class="flex-1 bg-slate-100 border-none rounded-full px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+      <button type="submit" class="bg-indigo-600 text-white p-2.5 rounded-full hover:bg-indigo-700 shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </form>
+    
   </div>
 </div>
+
+
 
 <!-- 🔔 Notification Popup -->
 <div id="notificationPopup" class="hidden fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50">

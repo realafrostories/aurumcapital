@@ -31,10 +31,14 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const chatWindow = document.getElementById("chatWindow");
-const chatInput = document.getElementById("chatInput");
-const sendBtn = document.getElementById("sendBtn");
-const statusIndicator = document.getElementById("supportStatus");
+// Selectors
+const chatWindow = document.getElementById("chatMessages"); 
+const chatInput = document.getElementById("chatInput"); 
+const chatForm = document.getElementById("chatForm"); 
+const chatSupportBtn = document.getElementById('chatSupportBtn'); 
+const supportModal = document.getElementById('supportModal');
+const closeSupportModal = document.getElementById('closeSupportModal');
+const blockedopenSupportbtn = document.getElementById('openSupportBtn');
 
 // Typing indicator
 const typingIndicator = document.createElement("div");
@@ -44,10 +48,28 @@ typingIndicator.style.display = "none";
 chatWindow.appendChild(typingIndicator);
 
 let userId = null;
+// ✅ Default fallback image if the user hasn't set one yet
+let userProfilePic = "https://img.freepik.com/premium-vector/person-with-blue-shirt-that-says-name-person_1029948-7040.jpg?semt=ais_hybrid&w=740"; 
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) return;
   userId = user.uid;
+
+  // ✅ Fetch user profile image from Firestore
+  try {
+    const userRef = doc(db, "Users", userId);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      const userData = userSnap.data();
+      if (userData.image) {
+        userProfilePic = userData.image; // Use the image from the Users collection[cite: 4]
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+  }
+
   loadMessages();
 });
 
@@ -73,10 +95,11 @@ function loadMessages() {
           }).format(timestamp)
         : "";
 
+      // ✅ Use the dynamically fetched profile pic for the user
       const avatarURL =
         msg.sender === "user"
-          ? "https://img.freepik.com/premium-vector/person-with-blue-shirt-that-says-name-person_1029948-7040.jpg?semt=ais_hybrid&w=740" // generic user icon
-          : "https://www.freeiconspng.com/uploads/displaying-14-images-for--customer-service-icon-png-23.png"; // admin/avatar icon
+          ? userProfilePic 
+          : "https://www.freeiconspng.com/uploads/displaying-14-images-for--customer-service-icon-png-23.png"; 
 
       div.innerHTML = `
         <div class="avatar">
@@ -91,20 +114,18 @@ function loadMessages() {
       chatWindow.appendChild(div);
     });
 
-    // Re-append typing indicator
     chatWindow.appendChild(typingIndicator);
     scrollToBottom();
   });
 }
 
-
-sendBtn.onclick = async () => {
+chatForm.onsubmit = async (e) => {
+  e.preventDefault(); 
+  
   const text = chatInput.value.trim();
   if (!text || !userId) return;
 
   const messagesRef = collection(db, "Support", userId, "messages");
-
-  // Fetch the last message
   const recentMessages = await getDocs(query(messagesRef, orderBy("timestamp", "desc"), limit(1)));
 
   let shouldAutoReply = true;
@@ -115,7 +136,6 @@ sendBtn.onclick = async () => {
     const lastTimestamp = lastMsg.timestamp?.toDate?.();
 
     if (lastSender !== "user") {
-      // Last message was from admin or bot, don't show auto-reply
       shouldAutoReply = false;
     } else if (lastTimestamp) {
       const now = new Date();
@@ -126,7 +146,6 @@ sendBtn.onclick = async () => {
     }
   }
 
-  // Save the user's message
   await addDoc(messagesRef, {
     sender: "user",
     text,
@@ -136,7 +155,6 @@ sendBtn.onclick = async () => {
   chatInput.value = "";
   scrollToBottom();
 
-  // Show typing + optional simulated bot reply
   if (shouldAutoReply) {
     showTyping();
     setTimeout(async () => {
@@ -169,4 +187,27 @@ function hideTyping() {
   typingIndicator.style.display = "none";
 }
 
+window.openSupport = () => {
+  if (supportModal) {
+    supportModal.style.display = 'flex';
+    scrollToBottom();
+  }
+};
 
+if (closeSupportModal) {
+  closeSupportModal.onclick = () => {
+    supportModal.style.display = 'none';
+  };
+}
+
+if (chatSupportBtn) {
+  chatSupportBtn.onclick = () => {
+    window.openSupport();
+  };
+}
+
+if (blockedopenSupportbtn) {
+  blockedopenSupportbtn.onclick = () => {
+    window.openSupport();
+  };
+}

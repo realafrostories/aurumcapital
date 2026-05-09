@@ -33,6 +33,9 @@ function loopScroll() {
 loopScroll();
 
 
+
+
+
 // Elements
 const referralLinkBox = document.getElementById("referralLink");
 const copyReferralBtn = document.getElementById("copyReferralBtn");
@@ -384,7 +387,7 @@ function getPlanName(amount) {
   if (amount >= 1_000_000) return "👑 Billionaire Plan";
   if (amount >= 100_000) return "🥇 Gold Plan";
   if (amount >= 40_000) return "💎 VIP Plan";
-  if (amount >= 10_000) return "🏢 Adrit Plan";
+  if (amount >= 10_000) return "🎁 Promo Plan";
   if (amount >= 2_000) return "🚀 Premium Plan";
   if (amount >= 100) return "🎯 Bronze Plan";
   return null;
@@ -393,7 +396,7 @@ function getPlanPercent(planName) {
   switch (planName) {
     case "Bronze Plan": return 10;
     case "Premium Plan": return 60;
-    case "Adrit Plan": return 160;
+    case "Promo Plan": return 160;
     case "VIP Plan": return 300;
     case "Gold Plan": return 500;
     case "Billionaire Plan": return 1200;
@@ -413,25 +416,6 @@ function getBonusFromDuration(code) {
 }
 
 
-
-
-function animateBalance(element, start, end, duration = 1000) {
-  const range = end - start;
-  const startTime = performance.now();
-
-  function update(currentTime) {
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const current = start + range * progress;
-    element.textContent = `$${formatMoney(current.toFixed(2))}`;
-
-    if (progress < 1) {
-      requestAnimationFrame(update);
-    }
-  }
-
-  requestAnimationFrame(update);
-}
 
 
 function formatMoney(value) {
@@ -1417,8 +1401,8 @@ onAuthStateChanged(auth, (user) => {
     const amount = parseFloat(document.getElementById("withdrawAmount").value.trim());
     const wallet = document.getElementById("walletAddress").value.trim();
 
-    if (!amount || amount < 50 || !wallet) {
-      alert("Enter a valid amount (minimum $50) and wallet address.");
+    if (!amount || amount < 1 || !wallet) {
+      alert("Enter a valid amount and wallet address.");
       return;
     }
 
@@ -1591,7 +1575,7 @@ document.getElementById("withdrawForm").addEventListener("submit", async (e) => 
   const amount = parseFloat(document.getElementById("withdrawAmount").value);
   const wallet = document.getElementById("withdrawWallet").value.trim();
 
-  if (isNaN(amount) || amount < 10 || !wallet) {
+  if (isNaN(amount) || amount < 1 || !wallet) {
     alert("❌ Enter valid amount and wallet.");
     return;
   }
@@ -1686,30 +1670,7 @@ function setupLogout() {
   });
 }
 
-function spawnFlyingCoins(container, isProfit = true, count = 5) {
-  const emoji = isProfit ? "🪙" : "🔻";
-  for (let i = 0; i < count; i++) {
-    const coin = document.createElement("span");
-    coin.className = "flying-coin" + (isProfit ? "" : " loss");
-    coin.textContent = emoji;
-    coin.style.left = `${Math.random() * 40 - 20}px`; // random start offset
-    container.appendChild(coin);
 
-    const endX = (Math.random() * 40) - 20;
-    const duration = 1200 + Math.random() * 600;
-
-    coin.animate([
-      { transform: `translate(0, 0)`, opacity: 1 },
-      { transform: `translate(${endX}px, ${isProfit ? -80 : 50}px)`, opacity: 0 }
-    ], {
-      duration,
-      easing: "ease-out",
-      fill: "forwards"
-    });
-
-    setTimeout(() => coin.remove(), duration);
-  }
-}
 
 // Better scoped tab switching for deposits only
 // Deposit tab switcher (only within #deposits tab-pane)
@@ -1726,11 +1687,6 @@ document.querySelectorAll(".tab").forEach(btn => {
   });
 });
 
-function copyText(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    alert("Copied to clipboard!");
-  });
-}
 
 document.getElementById("addFundsBtn")?.addEventListener("click", () => {
   const card = document.querySelector(".atm-card");
@@ -1788,7 +1744,6 @@ const getCurrentUserId = () => firebase.auth().currentUser?.uid;
 document.getElementById("closeWithdrawPopup")?.addEventListener("click", () => {
   document.getElementById("withdrawPopup").classList.add("hidden");
 });
-
 };
 
 
@@ -1864,8 +1819,8 @@ document.addEventListener("DOMContentLoaded", () => {
   btcInput.value = btc.toFixed(8);
 
   // Instead of re-setting the input (which breaks typing), show formatted preview
-  usdNote.textContent = usd < 10000
-    ? "⚠️ Minimum withdrawal is $10,000"
+  usdNote.textContent = usd < 1
+    ? "⚠️ Minimum withdrawal is $1"
     : `≈ ${btc.toFixed(8)} BTC`;
 
     validateForm();
@@ -1882,8 +1837,8 @@ document.addEventListener("DOMContentLoaded", () => {
   usdInput.value = formatWithCommas(usd);
 
   btcNote.textContent =
-    usd < 10000
-      ? `⚠️ Minimum is $10,000 (~${(10000 / btcRate).toFixed(8)} BTC)`
+    usd < 1
+      ? `⚠️ Minimum is $1 (~${(1 / btcRate).toFixed(8)} BTC)`
       : `≈ $${formatWithCommas(usd)}`;
 
   validateForm();
@@ -1897,7 +1852,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ? parseFloat(usdInput.value)
       : parseFloat(btcInput.value || 0) * (btcRate || 0);
     const wallet = walletField.value.trim();
-    return !isNaN(usdVal) && usdVal >= 10000 && usdVal <= walletBalance && wallet.length > 0;
+    return !isNaN(usdVal) && usdVal >= 1 && usdVal <= walletBalance && wallet.length > 0;
   }
 
   // 🔁 Toggle USD/BTC Fields
@@ -1932,14 +1887,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = `<span class="loader"></span> Submitting...`;
 
-    if (!wallet || wallet.length < 5) {
+    if (!wallet || wallet.length < 8) {
       showToast("Please enter a valid BTC wallet address", "warning");
       resetButton();
       return;
     }
 
-    if (isNaN(amount) || amount < 10000) {
-      showToast("Withdrawal must be at least $10,000", "warning");
+    if (isNaN(amount) || amount < 1) {
+      showToast("Withdrawal must be at least $1", "warning");
       resetButton();
       return;
     }
@@ -2002,8 +1957,6 @@ document.addEventListener("DOMContentLoaded", () => {
   
   });
 });
-
-
 
 
 
@@ -2585,3 +2538,4 @@ overlay.addEventListener('click', () => {
 });
 
 
+// Add these to handle the visual modal toggle
