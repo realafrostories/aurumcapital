@@ -105,15 +105,30 @@
   background: linear-gradient(145deg, #1e293b, #0f172a);
   padding: 2rem;
   width: 90%;
+  height: 80%;
   max-width: 420px;
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
   animation: scaleIn 0.3s ease;
   color: #f1f5f9;
   position: relative;
-  overflow: hidden;
+  overflow: auto;
 }
 
+
+/* 7. Scrollbar Styling for a premium look */
+.investment-popup-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+.investment-popup-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.investment-popup-box::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 10px;
+}
 .popup-title {
   font-size: 1.3rem;
   font-weight: 600;

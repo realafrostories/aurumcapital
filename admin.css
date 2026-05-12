@@ -1,460 +1,534 @@
-/* --- System Variables --- */
+/* --- High-End Modern Variables --- */
 :root {
-  --bg-slate: #f8fafc;
-  --panel-white: #ffffff;
-  --primary: #6366f1; /* Indigo */
-  --primary-hover: #4f46e5;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --border-light: #e2e8f0;
+  --bg-main: #fcfcfd;
+  --panel-glass: rgba(255, 255, 255, 0.9);
+  --primary: #4f46e5; /* Electric Indigo */
+  --primary-glow: rgba(79, 70, 229, 0.2);
+  --text-bold: #0f172a;
+  --text-soft: #475569;
+  --border-glass: rgba(226, 232, 240, 0.8);
   --success: #10b981;
-  --danger: #ef4444;
-  --radius-lg: 12px;
-  --radius-sm: 6px;
-  --shadow-subtle: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --font-stack: 'Inter', -apple-system, sans-serif;
+  --danger: #f43f5e;
+  --radius-pro: 16px;
+  --shadow-pro: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* --- Base Setup --- */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+/* --- Smooth Base Layout --- */
 body {
-  background-color: var(--bg-slate);
-  color: var(--text-main);
-  font-family: var(--font-stack);
-  padding: 2rem;
+  background-color: var(--bg-main);
+  color: var(--text-soft);
+  font-family: var(--font-main);
   -webkit-font-smoothing: antialiased;
+  padding: 2.5rem 1.5rem;
 }
 
-/* --- Dashboard Header --- */
-h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-  color: var(--text-main);
+/* --- Cinematic Header --- */
+header h2 {
+  font-size: 2rem;
+  letter-spacing: -0.025em;
+  font-weight: 800;
+  color: var(--text-bold);
+  margin-bottom: 0.5rem;
 }
 
-/* --- Modern Segmented Control (Tabs) --- */
+/* --- Floating Segmented Control (Tabs) --- */
 .tabs {
-  display: inline-flex;
   background: #f1f5f9;
-  padding: 4px;
-  border-radius: 10px;
-  gap: 2px;
+  padding: 6px;
+  border-radius: 14px;
+  display: inline-flex;
+  gap: 4px;
+  border: 1px solid var(--border-glass);
   margin-bottom: 2.5rem;
-  border: 1px solid var(--border-light);
 }
 
 .tab {
-  background: transparent;
   border: none;
-  padding: 8px 20px;
+  background: transparent;
+  padding: 10px 24px;
   font-weight: 600;
-  font-size: 0.875rem;
-  color: var(--text-muted);
+  font-size: 0.8rem;
+  color: var(--text-soft);
   cursor: pointer;
-  border-radius: 7px;
-  transition: all 0.2s ease;
+  border-radius: 10px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tab.active {
-  background: var(--panel-white);
+  background: white;
   color: var(--primary);
-  box-shadow: var(--shadow-subtle);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* --- High-Value Metric Cards (Sub-Tabs) --- */
 .sub-tabs-wrapper {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
+  gap: 1.25rem;
   margin-bottom: 3rem;
 }
 
 .sub-tab {
-  background: var(--panel-white);
-  border: 1px solid var(--border-light);
+  background: var(--panel-glass);
+  border: 1px solid var(--border-glass);
   padding: 1.5rem;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  font-size: 0.6rem;
-  flex-direction: row;
-  align-items: center; /* Center the counter horizontally */
-  justify-content: center; /* Center the counter vertically */
-  text-align: center;
-  min-height: 50px; /* Gives the card a nice consistent height */
-  box-shadow: var(--shadow-subtle);
+  border-radius: var(--radius-pro);
+  font-size: 0.7rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-pro);
+  text-align: left;
 }
-
-.sub-tab span { 
-  font-size: 0.9rem;/* Make the number slightly more prominent */
-  font-weight: 800;
-  color: blue; /* Use your primary color for the count */
-}
-
-
 
 .sub-tab:hover {
-  transform: translateY(-2px);
   border-color: var(--primary);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
+}
+
+.sub-tab span {
+  font-size: 1.0rem;
+  font-weight: 800;
+  color: var(--text-bold);
 }
 
 .sub-tab.active {
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
-  background: #f5f3ff; /* Very soft purple tint */
+  background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);
 }
 
-/* --- Record List Design --- */
+/* --- Premium Record Cards --- */
 .record-card {
-  background: var(--panel-white);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg);
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: var(--shadow-subtle);
-  animation: fadeIn 0.3s ease;
+  background: white;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-pro);
+  padding: 1.2rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-pro);
+  transition: transform 0.2s ease;
 }
 
-.record-info .amount {
-  font-size: 0.6rem;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-.record-info .user-id {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  font-family: monospace;
-}
-
-/* --- Action Buttons --- */
-.btn-group {
-  display: flex;
-  gap: 0.75rem;
-}
-
+/* --- Modern Buttons --- */
 .btn-approve {
   background: var(--primary);
   color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 700;
   border: none;
-  padding: 10px 20px;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  font-size: 0.875rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px 0 var(--primary-glow);
+}
+
+.btn-approve:hover {
+  background: var(--primary-hover);
+  transform: scale(1.02);
 }
 
 .btn-decline {
-  background: white;
+  background: #fff;
   color: var(--danger);
-  border: 1px solid var(--border-light);
-  padding: 10px 20px;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  font-size: 0.875rem;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  border: 1.5px solid #fee2e2;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.btn-approve:hover { background: var(--primary-hover); }
-.btn-decline:hover { background: #fef2f2; border-color: var(--danger); }
-
-/* --- Mobile Optimization --- */
-@media (max-width: 640px) {
-  body { padding: 1.5rem 1rem; }
-  
-  .tabs { width: 100%; overflow-x: auto; }
-  
-  .sub-tabs-wrapper { grid-template-columns: 1fr; }
-  
-  .record-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.25rem;
-  }
-  
-  .btn-group { width: 100%; }
-  .btn-approve, .btn-decline { flex: 1; text-align: center; }
+.btn-decline:hover {
+  background: #fef2f2;
+  border-color: var(--danger);
 }
 
-/* --- Utilities --- */
-.hidden { display: none !important; }
 
-@keyframes fadeIn {
+#adbtn{
+  background: #10b94b;
+  color: #ffffff;
+  font-size: 0.8rem;
+}
+
+#rmbtn{
+  background: #f03423;
+  color: #ffffff;
+  font-size: 0.8rem;
+}
+
+#chatbtn{
+  background: #222;
+  color: #ffffff;
+  font-size: 0.8rem;
+}
+#amttxt {
+  margin: 0;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+#amounttxt {
+  margin: 0;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* --- High-End Support Chat UI --- */
+
+/* 1. Modal Overlay Refinement */
+#adminChatModal {
+  backdrop-filter: blur(12px); /* Deep frosted glass effect */
+  background: rgba(15, 23, 42, 0.5); /* Slate-900 with transparency */
+  transition: opacity 0.3s ease;
+  z-index: 1000;
+}
+
+/* 2. Modal Container Fixes */
+#adminChatModal .bg-white {
+  background: var(--bg-main);
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Clips children to rounded corners */
+}
+
+/* 3. Pinned Header (Premium Gradient) */
+#adminChatModal .shrink-0.bg-indigo-700 {
+  background: linear-gradient(135deg, var(--primary) 0%, #312e81 100%);
+  padding: 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#chatTargetName {
+  font-family: var(--font-main);
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 4. The Message Area (Optimized Scrolling) */
+#adminChatMessages {
+  background-color: #f8fafc; /* Slate-50 */
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1; 
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-glow) transparent;
+}
+
+/* Scrollbar styling for Chrome/Safari */
+#adminChatMessages::-webkit-scrollbar {
+  width: 5px;
+}
+#adminChatMessages::-webkit-scrollbar-thumb {
+  background: var(--primary-glow);
+  border-radius: 10px;
+}
+
+/* 5. Modern Message Bubbles */
+.msg-bubble {
+  max-width: 82% !important; /* Forces layout constraints */
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Admin/Support Bubble (Right side) */
+.msg-admin {
+  align-self: flex-end;
+  background: var(--primary);
+  color: white;
+  border-radius: 18px 18px 4px 18px;
+  box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+/* User Bubble (Left side) */
+.msg-user {
+  align-self: flex-start;
+  background: white;
+  color: var(--text-bold);
+  border: 1px solid var(--border-glass);
+  border-radius: 18px 18px 18px 4px;
+}
+
+.msg-time {
+  display: block;
+  font-size: 10px;
+  margin-top: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.6;
+}
+
+.msg-admin .msg-time { color: rgba(255,255,255,0.8); }
+
+/* 6. The Input Area (The "Pill" Layout) */
+#adminChatForm {
+  background: white;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border-glass);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+#adminChatInput {
+  background: #f1f5f9;
+  border: 1.5px solid transparent;
+  height: 44px; /* Fixed professional height */
+  border-radius: 22px;
+  padding: 0 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-bold);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box; /* Critical for preventing overflow */
+}
+
+#adminChatInput:focus {
+  background: white;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-glow);
+}
+
+/* 7. Send Button Branding */
+#adminChatForm button[type="submit"] {
+  width: 44px;
+  height: 44px;
+  background: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  items-center: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, background 0.2s ease;
+  border: none;
+}
+
+#adminChatForm button[type="submit"]:hover {
+  background: #3730a3;
+  transform: scale(1.05);
+}
+
+/* 8. Animations */
+.animate-slideUp {
+  animation: chatSlide 0.3s ease-out;
+}
+
+@keyframes chatSlide {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-
-@media (max-width: 640px) {
-  .tabs {
-    display: flex;
-    width: 100%;
-    overflow-x: auto; /* Allow horizontal swiping */
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch; /* Smooth momentum scrolling */
-    padding: 6px;
-    scrollbar-width: none; /* Hide scrollbar for clean look */
-  }
-  
-  .tabs::-webkit-scrollbar {
-    display: none; /* Hide scrollbar for Chrome/Safari */
-  }
-
-  .tab {
-    flex: 0 0 auto; /* Prevent tabs from shrinking */
-    padding: 10px 20px;
-  }
-}
-
-
-/* The Pulse Animation */
-@keyframes pulse-red {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-}
-
-.pulse-alert {
-  position: relative;
-}
-
-/* The red dot indicator */
-.pulse-alert::after {
-  content: "";
-  position: absolute;
-  top: 10px;
-  right: 7px;
-  width: 8px;
-  height: 8px;
-  background-color: #ef4444; /* Red */
-  border-radius: 50%;
-  animation: pulse-red 2s infinite;
-  border: 2px solid white; /* Contrast against the tab */
-}
-
-
-/* Entry Animation */
-.animate-slideUp {
-  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes slideUp {
-  from { 
-    opacity: 0; 
-    transform: translateY(15px) scale(0.98); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0) scale(1); 
-  }
-}
-
-/* Ensure the container has a smooth height transition */
-#depositPendingList, #withdrawPendingList {
-  transition: all 0.5s ease;
-  min-height: 50px;
-}
-
-
-/* --- Desktop Constraint & Alignment --- */
-.tab-content {
-  max-width: 1200px; /* Prevents full-screen stretching */
-  margin: 0 auto;
-}
-
-/* --- Record Card Refinement --- */
-
-
-
-
-
-
-/* --- Mobile Specific Optimization --- */
-@media (max-width: 768px) {
-  body {
-    padding: 1rem 0.75rem;
-  }
-
-
-  .record-info .flex.justify-between {
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .amount {
-    font-size: 1.25rem;
-  }
-
-  /* Make copy button larger for touch */
-  .btn-copy {
-    padding: 12px;
-    background: #1e293b;
-  }
-
-  .btn-group {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 0.5rem;
-  }
-
-  .btn-approve, .btn-decline {
-    width: 100%;
-    justify-content: center;
-    padding: 12px;
-  }
-}
-
-/* --- High-End Shadow for Active States --- */
-.sub-tab.active {
-  background: #ffffff;
-  border-color: var(--primary);
-  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.1);
-}
-
-
-
-/* --- Glowing "NEW" Badge Animation --- */
-.badge-new {
-  background: var(--primary);
-  color: white;
-  font-size: 9px;
-  font-weight: 900;
-  padding: 2px 8px;
-  border-radius: 4px;
-  letter-spacing: 0.05em;
-  display: inline-flex;
-  align-items: center;
-  /* Trigger the pulse animation */
-  animation: badge-glow 2s infinite ease-in-out; 
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-@keyframes badge-glow {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
-    background-color: var(--primary);
-  }
-  50% {
-    transform: scale(1.05); /* Slight grow */
-    box-shadow: 0 0 10px 4px rgba(99, 102, 241, 0.3);
-    background-color: var(--primary-hover); /* Color shifts slightly darker */
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
-    background-color: var(--primary);
-  }
-}
-
-
-/* Financial Action Buttons */
-.adjust-btn {
-  transition: transform 0.1s active;
-}
-
-.adjust-btn:active {
-  transform: scale(0.95);
-}
-
-/* Ensure buttons stack nicely on very small screens */
-@media (max-width: 480px) {
-  .flex-wrap.gap-2 {
-    flex-direction: column;
-  }
-  
-  .flex-wrap.gap-2 button {
-    width: 100%;
-  }
-}
-
-/* --- Global Gradient Button Style --- */
-.btn-gradient-blue {
-  background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); /* Indigo to Deep Blue */
-  color: white !important;
-  border: 1px solid #3730a3;
-  box-shadow: 0 2px 4px rgba(67, 56, 202, 0.2);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-radius: 8px;
-}
-
-.btn-gradient-blue:hover {
-  background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(67, 56, 202, 0.3);
-}
-
-.btn-gradient-blue:active {
-  transform: translateY(0);
-  filter: brightness(90%);
-}
-
-/* Specific fix for the Balance Box to keep text visible against the white card */
-.bg-slate-100 {
-  background-color: #f1f5f9 !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-.wallet-val {
-  color: #059669 !important; /* Slightly darker Emerald for better white-background contrast */
-}
-
-/* Animation for when the admin clicks "Notify" */
-.btn-gradient-blue:active {
-  transform: scale(0.95);
-  filter: brightness(1.2);
-}
-
-/* Tooltip style for long messages (optional) */
-.notif-hint {
-  font-size: 10px;
-  color: var(--text-muted);
-  margin-top: 4px;
-  font-style: italic;
-}
-
-/* --- Support Chat Modal Fixes --- */
-#adminChatModal {
-  z-index: 9999; /* Ensure it sits above all other content */
-  backdrop-filter: blur(4px); /* Modern frosted glass effect */
-}
-
-/* Prevent the background body from scrolling when chat is open */
+/* Prevents background scroll when chat is open */
 body.modal-open {
   overflow: hidden;
 }
 
-#adminChatModal .bg-white {
-  max-height: 90vh; /* Keeps the modal within 90% of screen height */
-  width: 95%;
-  max-width: 450px;
-}
+/* --- Support Chat Modal UI FIXES --- */
 
-/* Crucial: This part handles the inner scroll */
-#adminChatMessages {
-  height: 100%;
-  overflow-y: auto;
+#adminChatModal .bg-white {
   display: flex;
   flex-direction: column;
-  scrollbar-width: thin;
-  scrollbar-color: #e2e8f0 transparent;
+  overflow: hidden;
 }
 
-/* Smooth slide up for the modal */
-.animate-slideUp {
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+/* Force the message area to grow and the footer to stay small */
+#adminChatMessages {
+  flex: 1; 
+  overflow-y: auto;
 }
+
+#adminChatForm {
+  flex-shrink: 0; /* Prevents the bar from expanding vertically */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: white;
+  border-top: 1px solid var(--border-glass);
+}
+
+#adminChatInput {
+  flex: 1;
+  height: 44px; /* Fixed height stops the "giant" look */
+  background: #f1f5f9;
+  border: 1.5px solid transparent;
+  border-radius: 22px !important; /* Perfect Pill Shape */
+  padding: 0 20px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+#adminChatInput:focus {
+  background: white;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-glow);
+}
+
+#adminChatForm button {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+
+/* --- High-End Chat Modal Constraints --- */
+
+#adminChatModal {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.6); /* Dark cinematic overlay */
+  padding: 1rem; /* Padding prevents it hitting screen edges on mobile */
+}
+
+#adminChatModal .bg-white {
+  width: 100%;
+  max-width: 420px; /* Crucial: Locks the width so it doesn't spread */
+  height: 650px;
+  max-height: 85dvh; /* Adapts to mobile browser heights */
+  display: flex;
+  flex-direction: column;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* --- The Header --- */
+.chat-header-pro {
+  background: linear-gradient(135deg, var(--primary) 0%, #312e81 100%);
+  padding: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* --- Message Container Fix --- */
+#adminChatMessages {
+  flex: 1; /* Takes up all available space */
+  overflow-y: auto;
+  padding: 1.5rem;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* --- The Footer/Input Bar Fix --- */
+#adminChatForm {
+  flex-shrink: 0; /* Stays at the bottom, never grows */
+  padding: 1rem;
+  background: white;
+  border-top: 1px solid var(--border-glass);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#adminChatInput {
+  flex: 1;
+  height: 44px;
+  border-radius: 22px;
+  background: #f1f5f9;
+  border: 1px solid transparent;
+  padding: 0 16px;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+
+/* Dark backdrop cursor hint */
+#adminChatModal {
+  cursor: pointer;
+}
+
+/* Ensure the actual chat box doesn't have the pointer cursor */
+#adminChatModal .bg-white {
+  cursor: default;
+}
+
+/* admin.css */
+
+/* Force the hidden class to always win */
+#adminChatModal.hidden {
+  display: none !important;
+}
+
+/* Base modal styles (without display: flex) */
+#adminChatModal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  backdrop-filter: blur(12px);
+  background: rgba(15, 23, 42, 0.5);
+}
+
+/* New class for when the modal is active */
+#adminChatModal.active-flex {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* admin.css */
+
+#adminChatModal .bg-white {
+  width: 100%;
+  max-width: 420px; /* Prevents spreading across screen */
+  height: 650px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+#adminChatInput {
+  flex: 1;
+  height: 44px; /* Fixed height stops stretching */
+  border-radius: 22px; /* Perfect pill shape */
+  padding: 0 16px;
+  background: #f1f5f9;
+  border: 1px solid transparent;
+  outline: none;
+}
+
+/* --- Notification Badge --- */
+.chat-btn-container {
+  position: relative; /* Needed to anchor the badge */
+}
+
+.chat-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 12px;
+  height: 12px;
+  background-color: var(--danger); /* Red from your variables */
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  animation: badge-pulse 1.5s infinite;
+}
+
+@keyframes badge-pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1.2); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+} 

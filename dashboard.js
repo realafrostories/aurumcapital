@@ -12,8 +12,8 @@ const firebaseConfig = {
   measurementId: "G-Z14JZMBJT1"
 };
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+export const auth = getAuth(app); 
+export const db = getFirestore(app);
 const liveEarningsState = new Map();
 
 let currentBtcRate = 0;
@@ -31,8 +31,6 @@ function loopScroll() {
 
 }
 loopScroll();
-
-
 
 
 
@@ -1639,22 +1637,142 @@ function getDurationMs(code) {
   }
 }
 
-function setupTabs() {
-  const tabs = document.querySelectorAll(".tab-btn");
-  const panes = document.querySelectorAll(".tab-pane");
-  const newInvestmentBtn = document.getElementById("newInvestmentBtn");
 
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      const target = tab.getAttribute("data-tab");
-      tabs.forEach(btn => btn.classList.remove("active"));
-      panes.forEach(p => p.classList.remove("active"));
-      tab.classList.add("active");
-      document.getElementById(target)?.classList.add("active");
-      newInvestmentBtn.classList.toggle("hidden", target !== "investments");
+
+
+// --- 1. MODAL ELEMENT CONSTANTS ---
+const investmentPopup = document.getElementById("investmentPopup");
+const cancelInvestBtn = document.getElementById("cancelInvestBtn");
+const newInvestmentBtn = document.getElementById("newInvestmentBtn");
+
+// --- 2. MODAL FUNCTIONS ---
+function openInvestmentPopup() {
+  if (investmentPopup) {
+    // We remove 'hidden' AND set display to 'flex' to be 100% sure it shows
+    investmentPopup.classList.remove("hidden");
+    investmentPopup.style.display = "flex"; 
+    document.body.style.overflow = "hidden"; // Stop background scroll
+    console.log("🔓 Investment Popup Opened");
+  }
+}
+
+function closeInvestmentPopup() {
+  if (investmentPopup) {
+    investmentPopup.classList.add("hidden");
+    investmentPopup.style.display = "none";
+    document.body.style.overflow = "auto"; // Resume background scroll
+    console.log("🔒 Investment Popup Closed");
+  }
+}
+
+// --- 3. EVENT LISTENERS ---
+
+// Close on Cancel Button
+if (cancelInvestBtn) {
+  cancelInvestBtn.onclick = (e) => {
+    e.preventDefault();
+    closeInvestmentPopup();
+  };
+}
+
+// Close when clicking the dark background (BUT NOT the box inside)
+window.addEventListener("click", (event) => {
+  if (event.target === investmentPopup) {
+    closeInvestmentPopup();
+  }
+});
+
+
+const withdrawPopup = document.getElementById("withdrawPopup");
+const closeWithdrawBtn = document.getElementById("closeWithdrawPopup");
+
+
+
+// Close on Background Click
+window.addEventListener("click", (event) => {
+  // Logic for Investment Popup
+  if (event.target === document.getElementById("investmentPopup")) {
+    closeInvestmentPopup();
+  }
+  // Logic for Withdraw Popup
+  if (event.target === withdrawPopup) {
+    closeWithdrawPopup();
+  }
+});
+
+// --- 4. UPDATED SETUPTABS ---
+function setupTabs() {
+  const mainTabButtons = document.querySelectorAll(".dashboard-tabs .tab-btn");
+  const mainContentPanes = document.querySelectorAll(".tab-content > .tab-pane");
+
+  mainTabButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const targetId = btn.getAttribute("data-tab");
+      const targetPane = document.getElementById(targetId);
+
+      if (!targetPane) return;
+
+      // Inside setupTabs() logic where you handle button clicks:
+if (targetId === "chatPane" || targetId === "chat") {
+}
+
+      // Switch Main Tabs
+      mainTabButtons.forEach(b => b.classList.remove("active"));
+      mainContentPanes.forEach(p => p.classList.remove("active"));
+
+      btn.classList.add("active");
+      targetPane.classList.add("active");
+
+      // TOGGLE "New Investment" button visibility based on tab
+      if (newInvestmentBtn) {
+        if (targetId === "investments") {
+          newInvestmentBtn.classList.remove("hidden");
+          // Re-attach the click listener every time the tab switches to be safe
+          newInvestmentBtn.onclick = openInvestmentPopup;
+        } else {
+          newInvestmentBtn.classList.add("hidden");
+        }
+      }
+    });
+  });
+
+  // Ensure the button works even if we are already on the investment tab on load
+  if (newInvestmentBtn) {
+    newInvestmentBtn.onclick = openInvestmentPopup;
+  }
+
+
+  // --- 2. DEPOSIT SUB-TAB LOGIC (Pending/Approved/Declined) ---
+  const depositSubTabs = document.querySelectorAll(".deposit-tabs .tab");
+  const depositSubPanes = document.querySelectorAll(".deposit-content .deposit-pane");
+
+  depositSubTabs.forEach(subBtn => {
+    subBtn.addEventListener("click", (e) => {
+      // Prevent this click from bubbling up to main dashboard logic
+      e.stopPropagation(); 
+      
+      const subTargetId = subBtn.getAttribute("data-tab"); // e.g. "pending"
+
+      // Remove active from all sub-tabs and sub-panes
+      depositSubTabs.forEach(b => b.classList.remove("active"));
+      depositSubPanes.forEach(p => p.classList.remove("active"));
+
+      // Add active to current sub-tab
+      subBtn.classList.add("active");
+      
+      // Match ID in HTML (e.g. "pendingPane")
+      const subPane = document.getElementById(subTargetId + "Pane");
+      if (subPane) {
+        subPane.classList.add("active");
+      }
     });
   });
 }
+
+
+
+
+
 function setupLogout() {
   document.getElementById("logoutBtn")?.addEventListener("click", async () => {
     if (!confirm("Are you sure you want to logout?")) return;
@@ -1675,17 +1793,7 @@ function setupLogout() {
 // Better scoped tab switching for deposits only
 // Deposit tab switcher (only within #deposits tab-pane)
 
-document.querySelectorAll(".tab").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
 
-    const tab = btn.dataset.tab;
-    document.querySelectorAll(".deposit-pane").forEach(pane => pane.classList.remove("active"));
-    
-    document.getElementById(`${tab}Pane`).classList.add("active");
-  });
-});
 
 
 document.getElementById("addFundsBtn")?.addEventListener("click", () => {

@@ -13,3 +13,90 @@
 .animate-fadeInUp {
   animation: fadeInUp 0.4s ease-out;
 }
+
+/* --- Pro User Management UI --- */
+
+#usersList {
+  perspective: 1000px;
+}
+
+/* The Card Container */
+.record-card {
+  background: white;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: visible; /* Required for the badge to hang off the edge */
+}
+
+/* Hover effect for a "Pro" feel */
+.record-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+}
+
+/* Red Glow for cards with Unread Messages */
+.record-card.border-red-500 {
+  border-color: #ef4444 !important;
+  background-color: #fffafb;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+}
+
+/* The Balance Box - SaaS Style */
+.bg-gray-100.rounded-xl {
+  background: #f8fafc !important;
+  border: 1px solid #f1f5f9;
+  padding: 12px 16px;
+}
+
+/* 🚩 The Floating Badge Counter */
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Button Stylings */
+.btn-gradient-blue {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.btn-gradient-blue:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
+}
+
+/* Add/Minus Small Buttons */
+button[onclick*="adjustBalance"] {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s;
+}
+
+button[onclick*="add"]:hover {
+  background: #ecfdf5;
+  color: #059669;
+  border-color: #10b981;
+}
+
+button[onclick*="minus"]:hover {
+  background: #fff1f2;
+  color: #e11d48;
+  border-color: #fb7185;
+}
+
+/* Loading Spinner Overlay */
+#usersLoading {
+  min-height: 300px;
+}

@@ -3508,3 +3508,45 @@ body.modal-open {
   opacity: 0.8;
   transform: scale(0.9);
 }
+
+/* 1. The Background Overlay */
+#withdrawPopup {
+  display: flex; /* JS will toggle to 'flex' */
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  
+  /* Centering Logic */
+  justify-content: center;
+  align-items: center;
+}
+
+/* 2. The Withdraw Card (Inner Box) */
+.withdraw-card {
+  background: #ffffff; /* White card based on your HTML */
+  width: 100%;
+  max-width: 450px;
+  
+  /* Critical: Prevent overflow */
+  max-height: 90vh; 
+  overflow-y: auto;
+  
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  margin: auto; /* Fail-safe centering */
+}
+
+/* 3. Scrollbar styling for the card */
+.withdraw-card::-webkit-scrollbar {
+  width: 5px;
+}
+.withdraw-card::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}

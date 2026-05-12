@@ -7,11 +7,11 @@ import {
   doc,
   getDoc,
   setDoc,
-  updateDoc,
+  updateDoc,getDocs,
   addDoc,
   query,
-  orderBy,
-  onSnapshot,
+  orderBy, where,
+  onSnapshot,limit,
   Timestamp,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -27,7 +27,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+export const db = getFirestore(app);
 
 // --- GLOBAL STATE ---
 let currentChatUserId = "";
@@ -38,6 +38,13 @@ let activeChatUserId = null;
 let chatUnsubscribe = null;
 // 🎵 Sound effect for new messages
 const msgSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
+
+
+// ✅ 1. Safe Date Helper (Prevents toDate() crash)
+const getSafeDate = (d) => {
+  if (d && typeof d.toDate === 'function') return d.toDate();
+  return d instanceof Date ? d : new Date(d || Date.now());
+};
 
 
 // ✅ UNIVERSAL DATE FORMATTER: "23 Feb. 2006"
@@ -124,15 +131,16 @@ function setupRealTimeBadges() {
 }
 
 
-
-
+/**
+ * Opens the admin chat modal for a specific user
+ * and listens for real-time messages.
+ */
 window.viewMessages = async (userId) => {
   const modal = document.getElementById("adminChatModal");
   
-  // ✅ Safety Check: If modal doesn't exist, stop the error
+  // 1. Safety Check: Verify modal exists
   if (!modal) {
     console.error("Critical Error: 'adminChatModal' not found in HTML.");
-    alert("Chat Modal is missing from the HTML file.");
     return;
   }
 
@@ -141,85 +149,129 @@ window.viewMessages = async (userId) => {
   const nameLabel = document.getElementById("chatTargetName");
   const idLabel = document.getElementById("chatTargetId");
 
-  // Open Modal
+  // 2. Open Modal & Update UI Labels
   modal.classList.remove("hidden");
-  idLabel.textContent = `UID: ${userId}`;
+  document.body.classList.add("modal-open"); // Prevents background scrolling
+  idLabel.textContent = `UID: ${userId.slice(0, 12)}...`;
 
-  // Fetch specific user data to show who you are talking to
+  const userCard = document.querySelector(`[data-user-id="${userId}"]`);
+  if (userCard) {
+    const badge = userCard.querySelector(".notif-badge");
+    if (badge) {
+      badge.classList.add("hidden");
+      badge.innerText = ""; // Reset the counter
+    }
+  }
+
+  // 3. Reset User's Unread Count in Firestore
   try {
-    const userDoc = await getDoc(doc(db, "Users", userId));
+    const userRef = doc(db, "Users", userId);
+    await updateDoc(userRef, { unreadCount: 0 });
+    
+    // Fetch username for the header
+    const userDoc = await getDoc(userRef);
     nameLabel.textContent = userDoc.exists() ? `Chat: ${userDoc.data().username}` : "Support Chat";
   } catch (e) {
+    console.warn("Could not update unread count or fetch username:", e);
     nameLabel.textContent = "Support Chat";
   }
 
-  // Clear previous listeners
+  // 4. Clear previous listeners to avoid memory leaks
   if (chatUnsubscribe) chatUnsubscribe();
 
-  // Load actual support messages from the specific user sub-collection
+  // 5. Load real-time messages from sub-collection
   const q = query(collection(db, "Support", userId, "messages"), orderBy("timestamp"));
   
   chatUnsubscribe = onSnapshot(q, (snapshot) => {
     msgContainer.innerHTML = "";
+    
     snapshot.forEach((doc) => {
       const msg = doc.data();
-      const isAdmin = msg.sender !== "user"; // dashboard.js treats non-"user" as support[cite: 2]
+      const isAdmin = msg.sender !== "user"; // support/admin sender
       
       const div = document.createElement("div");
-      div.className = `max-w-[85%] p-3 rounded-2xl text-sm animate-slideUp ${
-        isAdmin 
-        ? "bg-indigo-600 text-white self-end rounded-tr-none" 
-        : "bg-white text-slate-800 self-start rounded-tl-none border border-slate-200"
+      // Applying the 'msg-bubble' and side-specific classes from our Pro CSS
+      div.className = `msg-bubble animate-slideUp ${
+        isAdmin ? "msg-admin" : "msg-user"
       }`;
       
-      div.innerHTML = `<p>${msg.text}</p>`;
+      // Formatting timestamp if it exists
+      const timeStr = msg.timestamp 
+        ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+        : "...";
+
+      div.innerHTML = `
+        <p>${msg.text}</p>
+        <span class="msg-time">${timeStr}</span>
+      `;
+      
       msgContainer.appendChild(div);
     });
-    msgContainer.scrollTo({ top: msgContainer.scrollHeight, behavior: 'smooth' });
+
+    // 6. Smooth Scroll to Bottom
+    setTimeout(() => {
+      msgContainer.scrollTo({ top: msgContainer.scrollHeight, behavior: 'smooth' });
+    }, 100);
   });
 };
 
-// ✅ Ensure the form handler is correctly stopping the refresh
+/**
+ * Handle Sending Messages
+ */
 const adminChatForm = document.getElementById("adminChatForm");
-
 if (adminChatForm) {
   adminChatForm.onsubmit = async (e) => {
-    // 1. STOP THE REFRESH IMMEDIATELY
-    e.preventDefault(); 
+    e.preventDefault(); // STOP THE PAGE REFRESH
     
     const input = document.getElementById("adminChatInput");
     const text = input.value.trim();
 
-    // 2. Validate input and active user
+    // Validate input and active user context
     if (!text || !activeChatUserId) return;
 
     try {
-      // 3. Send message to the Support sub-collection
       const messagesRef = collection(db, "Support", activeChatUserId, "messages");
       
       await addDoc(messagesRef, {
-        sender: "support", // Dashboard.js recognizes this as the support agent
+        sender: "support",
         text: text,
         timestamp: serverTimestamp()
       });
 
-      // 4. Clear input and maintain focus for the next message
+      // Clear input and keep focus for rapid chatting
       input.value = "";
       input.focus(); 
       
-      // The onSnapshot in viewMessages will automatically scroll the new message into view
     } catch (err) {
       console.error("Failed to send message:", err);
-      alert("Message failed to send. Check your connection.");
+      alert("Message failed to send. Please try again.");
     }
   };
 }
 
+// --- Close Modal Logic ---
 window.closeAdminChat = () => {
   const modal = document.getElementById("adminChatModal");
-  if (modal) modal.classList.add("hidden");
-  if (chatUnsubscribe) chatUnsubscribe();
+  if (modal) {
+    modal.classList.add("hidden");
+    document.body.classList.remove("modal-open"); // Re-enable background scrolling
+  }
+  
+  // Stop listening for new messages to save resources
+  if (chatUnsubscribe) {
+    chatUnsubscribe();
+    chatUnsubscribe = null;
+  }
   activeChatUserId = null;
+};
+
+// --- Detect Clicks Outside the Modal ---
+window.onclick = function(event) {
+  const modal = document.getElementById("adminChatModal");
+  // If the user clicks the modal background (the dark overlay)
+  if (event.target === modal) {
+    closeAdminChat();
+  }
 };
 
 
@@ -467,105 +519,198 @@ window.sendNotificationbox = async (userId) => {
 
 
 
-// ✅ REAL-TIME USERS LOADER
-window.loadUsers = function() {
-  const container = document.getElementById("usersList");
-  if (!container) return;
+// ✅ Optimized Global Chat Listener for the Main Tab Badge
+function listenForGlobalUnread() {
+  const q = query(collectionGroup(db, "messages"), 
+            where("sender", "==", "user"), 
+            where("read", "==", false));
 
-  onSnapshot(collection(db, "Users"), (snapshot) => {
-    container.innerHTML = "";
-    
-    const userList = [];
-    snapshot.forEach(doc => userList.push({ id: doc.id, ...doc.data() }));
-    
-    // 1. Sort by newest registration first
-    userList.sort((a, b) => {
-      const timeA = a.createdAt?.toDate?.() || new Date(a.createdAt || 0);
-      const timeB = b.createdAt?.toDate?.() || new Date(b.createdAt || 0);
-      return timeB - timeA; 
-    });
-
-    // Get the timestamp of the last time the admin viewed this tab
-    const lastViewed = parseInt(localStorage.getItem('admin_last_viewed_users') || 0);
-
-    userList.forEach((userData) => {
-      const userId = userData.id;
-      const rawDate = userData.createdAt?.toDate?.() || new Date(userData.createdAt || Date.now());
-      const regDateFormatted = formatAdminDate(userData.createdAt);
-      
-      // 2. Individual Card Logic: Show "NEW" badge for 24 hours
-      const hoursSinceReg = (new Date() - rawDate) / (1000 * 60 * 60);
-      const isNewFor24h = hoursSinceReg < 24;
-
-      const userCard = document.createElement("div");
-      userCard.className = `record-card animate-slideUp ${isNewFor24h ? 'border-l-4 border-indigo-500' : ''}`;
-      
-      userCard.innerHTML = `
-    <div class="record-info w-full">
-      <div class="flex justify-between items-start">
-        <div class="flex items-center gap-2">
-          <h3 class="font-bold text-indigo-700 text-lg">${userData.username || "Unnamed"}</h3>
-          ${isNewFor24h ? '<span class="badge-new">NEW</span>' : ''}
-        </div>
-        <span class="text-[10px] text-slate-500 font-mono font-bold">${regDateFormatted}</span>
-      </div>
-      
-      <p class="text-sm text-slate-600 mb-3">${userData.email || "No Email"}</p>
-      
-      <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 mb-3">
-         <span class="text-[9px] uppercase text-slate-500 font-bold block mb-1">Available Balance</span>
-         <span class="wallet-val text-xl font-black text-emerald-700" id="bal-${userId}">$0</span>
-      </div>
-
-      <!-- ✅ GRADIENT FINANCIAL CONTROLS -->
-      <div class="flex gap-2 mb-2">
-         <button onclick="adjustBalance('${userId}', 'add')" 
-                 class="btn-gradient-blue flex-1 py-2.5 text-white text-[11px] font-bold rounded-md flex items-center justify-center gap-1">
-           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-           ADD FUNDS
-         </button>
-         <button onclick="adjustBalance('${userId}', 'minus')" 
-                 class="btn-gradient-blue flex-1 py-2.5 text-white text-[11px] font-bold rounded-md flex items-center justify-center gap-1">
-           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-           MINUS FUNDS
-         </button>
-      </div>
-
-      <!-- ✅ GRADIENT MANAGEMENT CONTROLS -->
-      <div class="flex gap-2 flex-wrap">
-         <button onclick="sendNotificationbox('${userId}')" class="btn-gradient-blue flex-1 py-2 text-[11px] font-bold">🔔 Notify</button>
-         <button onclick="viewMessages('${userId}')" class="btn-gradient-blue flex-1 py-2 text-[11px] font-bold">📨 Chat</button>
-         <button onclick="toggleBlockUser('${userId}')" class="btn-gradient-blue text-[11px] px-3 py-2 font-bold">
-            ${userData.blocked ? '🔓 Unblock' : '🚫 Block'}
-         </button>
-      </div>
-    </div>
-  `;
-      container.appendChild(userCard);
-
-      onSnapshot(doc(db, "Wallet", userId), (wSnap) => {
-        const balEl = document.getElementById(`bal-${userId}`);
-        if (balEl) balEl.textContent = `$${wSnap.exists() ? (wSnap.data().usd || 0).toLocaleString() : 0}`;
-      });
-    });
-
-    // 3. Tab Badge Logic: Pulse only for users registered AFTER the last visit[cite: 1]
-    const hasUnseenUsers = userList.some(u => {
-      const regTime = u.createdAt?.toDate?.()?.getTime() || new Date(u.createdAt || 0).getTime();
-      return regTime > lastViewed;
-    });
-    
+  onSnapshot(q, (snapshot) => {
+    const unreadCount = snapshot.size;
+    const badge = document.getElementById("chatBadge");
     const userTabBtn = document.getElementById("tabUsers");
-    const isCurrentlyOnUserTab = userTabBtn?.classList.contains('active');
-
-    // Only alert if there are unseen users AND the admin isn't currently looking at the list[cite: 1]
-    if (hasUnseenUsers && !isCurrentlyOnUserTab) {
+    
+    if (unreadCount > 0) {
+      if (badge) {
+        badge.textContent = unreadCount;
+        badge.classList.remove("hidden");
+      }
       userTabBtn?.classList.add("pulse-alert");
+      // Only play sound if the snapshot change is a new added document
+      if (!snapshot.metadata.hasPendingWrites) {
+         msgSound.play().catch(() => console.log("Interaction needed for audio"));
+      }
     } else {
+      badge?.classList.add("hidden");
       userTabBtn?.classList.remove("pulse-alert");
     }
   });
+}
+
+// ✅ 2. FULL UPDATED loadUsers (Instant Real-time & Badges)
+// ✅ Helper to prevent "toDate" crashes
+
+
+window.loadUsers = function() {
+  const container = document.getElementById("usersList");
+  const loader = document.getElementById("usersLoading");
+  if (!container) return;
+
+  let isInitialLoad = true;
+
+  // Real-time listener for the Users collection
+  onSnapshot(collection(db, "Users"), async (snapshot) => {
+    let userRegistry = [];
+
+    // Map through users and fetch their specific chat stats
+    const userPromises = snapshot.docs.map(async (userDoc) => {
+      const userId = userDoc.id;
+      const userData = userDoc.data();
+
+      // Queries for notifications/activity
+      const unreadQuery = query(
+        collection(db, "Support", userId, "messages"),
+        where("sender", "==", "user"),
+        where("read", "==", false)
+      );
+      
+      const latestMsgQuery = query(
+        collection(db, "Support", userId, "messages"),
+        orderBy("timestamp", "desc"),
+        limit(1)
+      );
+
+      const [unreadSnap, latestSnap] = await Promise.all([
+        getDocs(unreadQuery),
+        getDocs(latestMsgQuery)
+      ]);
+
+      // Handle date safety (uses helper from admin.js or local fallback)
+      const getSafeDate = (ts) => (ts instanceof Timestamp ? ts.toDate() : new Date(ts || 0));
+
+      let lastActive = getSafeDate(userData.createdAt);
+      if (!latestSnap.empty) {
+        lastActive = getSafeDate(latestSnap.docs[0].data().timestamp);
+      }
+
+      return {
+        ...userData,
+        id: userId,
+        unreadCount: unreadSnap.size,
+        lastActivity: lastActive
+      };
+    });
+
+    // Wait for all data to process to stop UI jitter
+    userRegistry = await Promise.all(userPromises);
+
+    // Sort: Unread messages first, then by most recent activity
+    userRegistry.sort((a, b) => b.unreadCount - a.unreadCount || b.lastActivity - a.lastActivity);
+
+    // Render using DocumentFragment for high performance
+    const fragment = document.createDocumentFragment();
+    
+    userRegistry.forEach(user => {
+      const card = document.createElement("div");
+      const hasUnread = user.unreadCount > 0;
+      const isBlocked = user.blocked === true;
+
+      // ✅ CRITICAL: Added 'data-user-id' so notifications.js can find this card
+      card.setAttribute('data-user-id', user.id);
+      
+      // Applying your pro styles and pulse alert if unread
+      card.className = `record-card p-5 relative animate-slideUp ${
+        hasUnread ? 'border-indigo-500 shadow-lg' : 'border-gray-200'
+      }`;
+
+      card.innerHTML = `
+${hasUnread ? `
+  <div class="absolute -top-3 -right-3 z-30">
+    <div class="bg-red-600 text-white text-[11px] font-black h-8 w-8 flex items-center justify-center rounded-full shadow-lg ring-4 ring-white animate-bounce notif-badge">
+      ${user.unreadCount}
+    </div>
+  </div>
+` : `
+  <div class="absolute -top-3 -right-3 z-30">
+    <div class="notif-badge hidden bg-red-600 text-white text-[11px] font-black h-8 w-8 flex items-center justify-center rounded-full shadow-lg ring-4 ring-white animate-bounce">
+      0
+    </div>
+  </div>
+`}
+
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h3 class="text-gray-900 font-extrabold text-lg tracking-tight">${user.username || 'User'}</h3>
+            <p class="text font-small text-black">${user.email}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-[9px] font-bold text-gray-400 uppercase">
+              ${user.createdAt 
+                ? (typeof user.createdAt.toDate === 'function' 
+                    ? user.createdAt.toDate().toLocaleDateString() 
+                    : new Date(user.createdAt).toLocaleDateString())
+                : 'N/A'}
+            </p>
+          </div>
+        </div>
+        
+        <div class="bg-gray-50 p-3 rounded-xl mb-4 border border-gray-100">
+          <div class="flex justify-between items-center">
+            <span class="text-[6px] font-bold text-gray-400 uppercase" id="amttxt">Usd Balance:</span>
+            <span class="text-[10px] font-bold text-green "  id="bal-${user.id}">$0.00</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mb-2">
+          <button onclick="adjustBalance('${user.id}', 'add')" id="adbtn" class="bg-gray-100 hover:bg-emerald-50 text-emerald-700 text-[10px] font-bold py-2 rounded-lg transition-colors">
+            + ADD FUNDS
+          </button>
+          <button onclick="adjustBalance('${user.id}', 'minus')" id="rmbtn" class="bg-gray-100 hover:bg-red-50 text-red-700 text-[10px] font-bold py-2 rounded-lg transition-colors">
+            - MINUS FUNDS
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mb-3">
+          <button onclick="toggleBlockUser('${user.id}')" class="bg-gray-100 hover:bg-gray-800 hover:text-white text-gray-700 text-[10px] font-bold py-2 rounded-lg transition-all">
+            ${isBlocked ? '🔓 UNBLOCK' : '🚫 BLOCK'}
+          </button>
+          <button onclick="sendNotificationbox('${user.id}')" class="bg-gray-100 hover:bg-indigo-600 hover:text-white text-gray-700 text-[10px] font-bold py-2 rounded-lg transition-all">
+            🔔 NOTIFY
+          </button>
+        </div>
+
+        <button onclick="viewMessages('${user.id}')" id="chatbtn" class="btn-gradient-blue w-full py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-transform hover:scale-[1.02] active:scale-95">
+          📨 CHAT SUPPORT 
+          ${hasUnread ? `<span class="bg-white text-indigo-600 px-2 py-0.5 rounded-full text-[10px] ml-1">${user.unreadCount}</span>` : ''}
+        </button>
+      `;
+
+      fragment.appendChild(card);
+      
+      // Real-time balance listener for this specific card
+      onSnapshot(doc(db, "Wallet", user.id), (wSnap) => {
+        const bEl = document.getElementById(`bal-${user.id}`);
+        if (bEl) {
+          const balance = wSnap.data()?.usd || 0;
+          bEl.textContent = `$${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+        }
+      });
+    });
+
+    container.innerHTML = "";
+    container.appendChild(fragment);
+
+    // Initial Load UI Logic
+    if (isInitialLoad) {
+      if (loader) loader.classList.add("hidden");
+      container.classList.remove("opacity-0");
+      isInitialLoad = false;
+    }
+  });
 };
+
+
+
 
 
 window.adjustBalance = async (userId, action) => {
