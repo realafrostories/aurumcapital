@@ -813,11 +813,20 @@ window.processAction = async (type, userId, recordId, action) => {
   }
 };
 
-// ✅ TAB LISTENERS
+// ✅ UPDATED: TAB LISTENERS
 function setupTabListeners() {
   document.getElementById("tabDeposits").onclick = () => switchMainTab("deposits");
   document.getElementById("tabWithdrawals").onclick = () => switchMainTab("withdrawals");
   document.getElementById("tabUsers").onclick = () => switchMainTab("users");
+  
+  // New: Others Tab Listener
+  const tabOthers = document.getElementById("tabOthers");
+  if (tabOthers) {
+    tabOthers.onclick = () => {
+      switchMainTab("others");
+      initOthersTabLogic(); // Initialize the settings listeners when tab is opened
+    };
+  }
 
   const subMapping = [
     { id: "depositTabPending", type: "Deposits", status: "pending", list: "depositPendingList" },
@@ -829,42 +838,98 @@ function setupTabListeners() {
   ];
 
   subMapping.forEach(m => {
-  const btn = document.getElementById(m.id);
-  if (btn) {
-    btn.onclick = () => {
-      const parent = btn.parentElement;
-      if (!parent) return;
+    const btn = document.getElementById(m.id);
+    if (btn) {
+      btn.onclick = () => {
+        const parent = btn.parentElement;
+        if (!parent) return;
 
-      // 1. Update Sub-Tab Button UI
-      parent.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active', 'bg-blue-100'));
-      btn.classList.add('active', 'bg-blue-100');
+        parent.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active', 'bg-blue-100'));
+        btn.classList.add('active', 'bg-blue-100');
 
-      // 2. Resolve Section ID (Handles 'PendingSection' or 'SectionPending')
-      const pattern1 = m.id.replace('Tab', 'Section'); // e.g., depositSectionPending
-      const pattern2 = m.id.replace('Tab', '') + 'Section'; // e.g., depositPendingSection
-      
-      const targetSection = document.getElementById(pattern1) || document.getElementById(pattern2);
-      
-      if (targetSection) {
-        // Hide all sibling sections in the main tab content
-        const mainContent = btn.closest('.tab-content');
-        mainContent.querySelectorAll('.sub-section').forEach(s => {
-          s.classList.add('hidden');
-          s.classList.remove('active');
-        });
+        const pattern1 = m.id.replace('Tab', 'Section');
+        const pattern2 = m.id.replace('Tab', '') + 'Section';
+        
+        const targetSection = document.getElementById(pattern1) || document.getElementById(pattern2);
+        
+        if (targetSection) {
+          const mainContent = btn.closest('.tab-content');
+          mainContent.querySelectorAll('.sub-section').forEach(s => {
+            s.classList.add('hidden');
+            s.classList.remove('active');
+          });
 
-        // Show the correct one
-        targetSection.classList.remove('hidden');
-        targetSection.classList.add('active');
-      } else {
-        console.error(`Could not find section for ${m.id}. tried: ${pattern1}, ${pattern2}`);
-      }
+          targetSection.classList.remove('hidden');
+          targetSection.classList.add('active');
+        }
 
-      // 3. Load the data
-      loadRecords(m.type, m.status, m.list);
-    };
+        loadRecords(m.type, m.status, m.list);
+      };
+    }
+  });
+}
+
+
+
+
+
+
+// --- ADMIN: OTHERS TAB LOGIC ---
+async function initOthersTabLogic() {
+  const updateMinBtn = document.getElementById("updateMinDepositBtn");
+  const newMinInput = document.getElementById("newMinDeposit");
+  const statusText = document.getElementById("minDepositStatus");
+
+  if (!updateMinBtn) return;
+
+  // 1. Initial Load: Try to get the value, fallback to 100 if missing
+  try {
+    const settingsSnap = await getDoc(doc(db, "Settings", "depositSettings"));
+    let currentVal = 100; // Default fallback
+    
+    if (settingsSnap.exists()) {
+      currentVal = settingsSnap.data().minAmount;
+    }
+    
+    newMinInput.value = currentVal; // Set the actual input value
+    newMinInput.placeholder = `Current: $${currentVal}`;
+  } catch (err) {
+    console.error("Error fetching settings:", err);
+    newMinInput.value = 100; // Fallback on error
   }
-});
+
+  // 2. Update Threshold
+  updateMinBtn.onclick = async () => {
+    const newAmount = parseFloat(newMinInput.value);
+
+    if (isNaN(newAmount) || newAmount < 1) {
+      alert("Please enter a valid amount.");
+      return;
+    }
+
+    try {
+      updateMinBtn.disabled = true;
+      updateMinBtn.innerText = "Saving...";
+
+      await setDoc(doc(db, "Settings", "depositSettings"), {
+        minAmount: newAmount,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
+      statusText.innerText = "✅ Threshold Updated Successfully";
+      statusText.className = "mt-3 text-sm text-green-600 font-bold";
+      statusText.classList.remove("hidden");
+      newMinInput.placeholder = `Current: $${newAmount}`;
+      
+      setTimeout(() => statusText.classList.add("hidden"), 3000);
+    } catch (error) {
+      console.error("Update failed:", error);
+      alert("Failed to save to database.");
+    } finally {
+      updateMinBtn.disabled = false;
+      updateMinBtn.innerText = "Change Threshold";
+    }
+  };
 }
 
 // ✅ HELPERS

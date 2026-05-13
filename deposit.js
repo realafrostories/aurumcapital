@@ -42,6 +42,7 @@ let currentUserId = null;
 let currentDepositAmount = 0;
 let selectedCrypto = null;
 let currentDepositRef = null;
+let minDepositAmount = 100; // Default fallback if Firestore is empty
 
 // DOM Elements
 const amountInput = document.getElementById("usdAmount");
@@ -94,14 +95,30 @@ const cryptoInfo = {
   GiftCard: {
     address: "support@AurumCapital.com",
     rate: 1,
-    qr: "" // QR code is not needed for GiftCard
+    qr: "" 
   }
 };
+
+// --- NEW: Dynamic Minimum Deposit Listener ---
+// This listens to the threshold set by Admin in the "Others" tab
+const settingsRef = doc(db, "Settings", "depositSettings");
+onSnapshot(settingsRef, (snapshot) => {
+  if (snapshot.exists()) {
+    minDepositAmount = parseFloat(snapshot.data().minAmount) || 100;
+  } else {
+    minDepositAmount = 100; // Fallback
+  }
+  
+  if (amountInput) {
+    amountInput.min = minDepositAmount;
+    amountInput.placeholder = `Minimum $${minDepositAmount}`;
+  }
+  console.log("🔔 Global Min Deposit threshold:", minDepositAmount);
+});
 
 // Auth state
 onAuthStateChanged(auth, user => {
   if (!user) return window.location.href = "signin.html";
-  
   currentUserId = user.uid;
 });
 
@@ -112,21 +129,21 @@ cryptoButtons.forEach(button => {
     const info = cryptoInfo[selectedCrypto];
 
     if (selectedCrypto === "GiftCard") {
-      // Show gift card form, hide payment section
       giftCardForm?.classList.remove("hidden");
       paymentSection.classList.add("hidden");
       return;
     }
 
-    const usdAmount = `${parseFloat(amountInput.value)}`;
-    if (isNaN(usdAmount) || usdAmount < 100) {
-      alert("Minimum deposit is $100.");
+    const usdAmount = parseFloat(amountInput.value);
+    
+    // Check against the dynamic threshold
+    if (isNaN(usdAmount) || usdAmount < minDepositAmount) {
+      alert(`Minimum deposit is $${minDepositAmount}.`);
       return;
     }
 
     currentDepositAmount = usdAmount;
 
-    // Show crypto payment details
     giftCardForm?.classList.add("hidden");
     rateEl.textContent = `Send ${(usdAmount / info.rate).toFixed(6)} ${selectedCrypto}`;
     qrEl.src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(info.address)}&size=150x150`;
@@ -135,11 +152,9 @@ cryptoButtons.forEach(button => {
   });
 });
 
-
-
 // Confirm deposit
 confirmBtn.addEventListener("click", async () => {
-  if (!currentUserId || currentDepositAmount < 100 || !selectedCrypto) return;
+  if (!currentUserId || currentDepositAmount < minDepositAmount || !selectedCrypto) return;
 
   const depositId = crypto.randomUUID();
   currentDepositRef = doc(db, "Deposits", currentUserId, "records", depositId);
@@ -167,7 +182,7 @@ giftCardSubmitBtn?.addEventListener("click", async () => {
     return alert("Please fill in all required gift card fields.");
   }
 
-  currentDepositAmount = claimedValue; // ✅ set amount here too
+  currentDepositAmount = claimedValue; 
 
   const depositId = crypto.randomUUID();
   currentDepositRef = doc(db, "Deposits", currentUserId, "records", depositId);
@@ -177,7 +192,7 @@ giftCardSubmitBtn?.addEventListener("click", async () => {
   cardProof = giftCardCode.trim();
 
   await setDoc(currentDepositRef, {
-    amount: currentDepositAmount, // ✅ fixed
+    amount: currentDepositAmount,
     method: "GiftCard",
     cardType,
     cardValue,
@@ -192,14 +207,11 @@ giftCardSubmitBtn?.addEventListener("click", async () => {
   listenForConfirmation();
 });
 
-
-// Show popup
 function showDepositPopup() {
   popup.classList.remove("hidden");
   minimized.classList.add("hidden");
 }
 
-// Listen for Firestore confirmation
 function listenForConfirmation() {
   onSnapshot(currentDepositRef, async snapshot => {
     if (!snapshot.exists()) return;
@@ -207,45 +219,39 @@ function listenForConfirmation() {
     const status = snapshot.data().status;
 
     if (status === "true") {
-  popup.classList.add("hidden");
-  minimized.classList.add("hidden");
-  successPopup.classList.remove("hidden");
+      popup.classList.add("hidden");
+      minimized.classList.add("hidden");
+      successPopup.classList.remove("hidden");
 
-  successAmountEl.textContent = `🎉 You successfully deposited $${parseFloat(currentDepositAmount).toFixed(2)}!`;
+      successAmountEl.textContent = `🎉 You successfully deposited $${parseFloat(currentDepositAmount).toFixed(2)}!`;
 
-  const walletRef = doc(db, "Wallet", currentUserId);
+      const walletRef = doc(db, "Wallet", currentUserId);
 
-  try {
-    const walletSnap = await getDoc(walletRef);
-    const prevAmount = walletSnap.exists() && walletSnap.data().usd
-      ? parseFloat(walletSnap.data().usd)
-      : 0;
+      try {
+        const walletSnap = await getDoc(walletRef);
+        const prevAmount = walletSnap.exists() && walletSnap.data().usd
+          ? parseFloat(walletSnap.data().usd)
+          : 0;
 
-    const updatedAmount = prevAmount + parseFloat(currentDepositAmount);
+        const updatedAmount = prevAmount + parseFloat(currentDepositAmount);
 
-    if (walletSnap.exists()) {
-      await updateDoc(walletRef, { usd: updatedAmount });
-    } else {
-      await setDoc(walletRef, { usd: updatedAmount });
+        if (walletSnap.exists()) {
+          await updateDoc(walletRef, { usd: updatedAmount });
+        } else {
+          await setDoc(walletRef, { usd: updatedAmount });
+        }
+      } catch (e) {
+        console.error("❌ Wallet update error:", e);
+      }
     }
-
-    console.log("✅ Wallet updated:", updatedAmount);
-  } catch (e) {
-    console.error("❌ Wallet update error:", e);
-  }
-}
-
-    // else status is pending or something else — keep popup open
   });
 }
 
-// Minimize deposit popup
 minimizeBtn.addEventListener("click", () => {
   popup.classList.add("hidden");
   minimized.classList.remove("hidden");
 });
 
-// Success buttons
 goDashboardBtn?.addEventListener("click", () => {
   window.location.href = "dashboard.html";
 });
@@ -259,7 +265,6 @@ newDepositBtn?.addEventListener("click", () => {
   selectedCrypto = null;
 });
 
-// Failed deposit "Try Again Later" button logic
 tryAgainBtn.addEventListener("click", () => {
   failedPopup.classList.add("hidden");
   amountInput.value = "";
@@ -269,43 +274,30 @@ tryAgainBtn.addEventListener("click", () => {
   selectedCrypto = null;
 });
 
-
-// --- Added toggle logic for GiftCard image/code input --- //
-
 window.addEventListener("DOMContentLoaded", () => {
   onAuthStateChanged(auth, async (user) => {
     if (!user) return (window.location.href = "signin.html");
 
-     try {
-    const userDoc = await getDoc(doc(db, "Users", user.uid));
-    if (userDoc.exists()) {
-      const userData = userDoc.data();
-
-      if (userData.blocked === true) {
-        const overlay = document.getElementById("blockedOverlay");
-        overlay.classList.remove("hidden");
-
-        const supportBtn = document.getElementById("contactSupportBtn");
-        supportBtn.addEventListener("click", () => {
-          window.location.href = "support.html";
-        });
-
-        // Prevent scroll & interaction
-        document.body.style.overflow = "hidden";
+    try {
+      const userDoc = await getDoc(doc(db, "Users", user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData.blocked === true) {
+          const overlay = document.getElementById("blockedOverlay");
+          overlay.classList.remove("hidden");
+          const supportBtn = document.getElementById("openSupportBtn");
+          supportBtn.addEventListener("click", () => {
+            window.location.href = "support.html";
+          });
+          document.body.style.overflow = "hidden";
+        }
       }
+    } catch (err) {
+      console.error("❌ Failed to check block status:", err);
     }
-  } catch (err) {
-    console.error("❌ Failed to check block status:", err);
-  }
-  
   });
-
-  
 });
 
-
-
-// Copy crypto address functionality
 const copyBtn = document.getElementById('copyAddressBtn');
 const cryptoAddressEl = document.getElementById('cryptoAddress');
 

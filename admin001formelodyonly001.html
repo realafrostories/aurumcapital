@@ -19,7 +19,30 @@
     <button id="tabDeposits" class="tab pb-2 px-4 font-semibold border-b-2 border-transparent">💰 Deposits</button>
     <button id="tabWithdrawals" class="tab pb-2 px-4 font-semibold border-b-2 border-transparent">💸 Withdrawals</button>
     <button id="tabUsers" class="tab pb-2 px-4 font-semibold border-b-2 border-transparent">👥 Users</button>
+    <button id="tabOthers" class="tab pb-2 px-4 font-semibold border-b-2 border-transparent">⚙️ Others</button>
   </div>
+
+
+
+  <!--Others Content-->
+  <div id="othersContent" class="tab-content hidden p-6">
+  <div class="bg-white p-6 rounded-xl shadow-md max-w-lg">
+    <h3 class="text-xl font-bold mb-4">Admin Functions</h3>
+    <label class="block text-sm font-medium text-gray-700 mb-2">Deposit Threshold (USD)</label>
+    <div class="flex gap-4">
+      <input type="number" id="newMinDeposit" class="flex-1 p-2 border rounded-lg" value="100">
+      <button id="updateMinDepositBtn" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold">
+        Change Threshold
+      </button>
+    </div>
+    <p id="minDepositStatus" class="mt-3 text-sm hidden"></p>
+  </div>
+</div>
+
+
+
+
+
 
   <!-- ========== Deposits Content ========== -->
   <div id="depositsContent" class="tab-content hidden">
